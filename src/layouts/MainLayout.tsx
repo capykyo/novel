@@ -1,4 +1,3 @@
-import "@/styles/globals.css";
 import { Header, Footer } from "@/components/layout";
 import GlobalSettingsButton from "@/components/GlobalSettingsButton";
 import { useSettings } from "../contexts/SettingsContext";

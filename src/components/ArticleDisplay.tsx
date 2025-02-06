@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { usePagination } from "@/utils/paginationCache";
 import { Icon } from "@iconify-icon/react";
-import "@/styles/article.css";
 import { useSettings } from "@/contexts/SettingsContext";
 
 interface ArticleDisplayProps {
