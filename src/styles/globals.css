@@ -19,3 +19,12 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Tailwind does not support dynamic class names directly in JSX, so we define these classes here */
+.day-theme {
+  @apply bg-lime-200 text-stone-950;
+}
+
+.night-theme {
+  @apply bg-slate-900 text-gray-400; /* 深墨绿色可以用更具体的颜色代替，比如 #2e4057 */
+}
