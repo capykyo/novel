@@ -22,7 +22,7 @@ function ArticleDisplay({ initialArticleNumber }: ArticleDisplayProps) {
   }, [currentPage]);
 
   return (
-    <div className="">
+    <div className="content">
       <div
         style={{ fontSize: `${textSize}px` }}
         dangerouslySetInnerHTML={{ __html: content }}

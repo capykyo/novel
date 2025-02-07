@@ -1,3 +1,11 @@
 #content {
     @apply flex flex-col gap-y-6;
 }
+
+.content h1 {
+    font-size: 22px;
+    text-align: center;
+}
+.content p {
+    text-indent: 2em;
+}

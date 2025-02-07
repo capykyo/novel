@@ -2,7 +2,9 @@ import type { GetServerSideProps } from "next";
 import MainLayout from "../layouts/MainLayout";
 import ArticleDisplay from "../components/ArticleDisplay";
 
-function getInitialArticleNumber(articleNumberFromServer?: string | null): number {
+function getInitialArticleNumber(
+  articleNumberFromServer?: string | null
+): number {
   if (typeof window !== "undefined") {
     const savedNumber = localStorage.getItem("articleNumber");
     return savedNumber
@@ -22,16 +24,17 @@ export default function Home({
 
   return (
     <MainLayout>
-      <div className="">
-        <ArticleDisplay initialArticleNumber={initialArticleNumber} />
-      </div>
+      <ArticleDisplay initialArticleNumber={initialArticleNumber} />
     </MainLayout>
   );
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   // 从 cookie 中获取 articleNumber
-  const articleNumberFromCookie = context.req.cookies.articleNumber === undefined ? null : context.req.cookies.articleNumber;
+  const articleNumberFromCookie =
+    context.req.cookies.articleNumber === undefined
+      ? null
+      : context.req.cookies.articleNumber;
 
   return {
     props: {
