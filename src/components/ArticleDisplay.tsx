@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { usePagination } from "@/utils/paginationCache";
 import { Icon } from "@iconify-icon/react";
 import { useSettings } from "@/contexts/SettingsContext";
+import cookie from 'js-cookie';
 
 interface ArticleDisplayProps {
   initialArticleNumber: string | number;
@@ -16,6 +17,7 @@ function ArticleDisplay({ initialArticleNumber }: ArticleDisplayProps) {
   useEffect(() => {
     if (typeof window !== "undefined") {
       localStorage.setItem("articleNumber", currentPage.toString());
+      cookie.set('articleNumber', currentPage.toString());
     }
   }, [currentPage]);
 
