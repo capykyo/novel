@@ -4,7 +4,20 @@ import { useState, useEffect, useCallback } from "react";
 function cleanHtmlContent(htmlString: string): string {
   const parser = new DOMParser();
   const doc = parser.parseFromString(htmlString, "text/html");
+  const body = doc.body;
   const allElements = doc.body.querySelectorAll("*");
+
+  const adElement = body.querySelector("#ad");
+
+  if (adElement) {
+    adElement.remove();
+  }
+
+  const pageListElement = body.querySelector(".list_page");
+
+  if (pageListElement) {
+    pageListElement.remove();
+  }
 
   allElements.forEach((element) => {
     element.removeAttribute("class");

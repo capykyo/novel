@@ -19,3 +19,35 @@ export function cleanHtmlContent(htmlString: string): string {
   // 返回清理后的HTML内容
   return doc.body.innerHTML;
 }
+
+// 防抖函数
+export function debounce<Args extends unknown[]>(
+  func: (...args: Args) => void,
+  delay: number
+): (...args: Args) => void {
+  let timer: NodeJS.Timeout | null;
+  return (...args: Args) => {
+    if (timer) {
+      clearTimeout(timer);
+    }
+    timer = setTimeout(() => {
+      func(...args);
+      timer = null;
+    }, delay);
+  };
+}
+
+// 节流函数
+export function throttle<Args extends unknown[]>(
+  func: (...args: Args) => void,
+  limit: number
+): (...args: Args) => void {
+  let inThrottle: boolean = false;
+  return (...args: Args) => {
+    if (!inThrottle) {
+      func(...args);
+      inThrottle = true;
+      setTimeout(() => (inThrottle = false), limit);
+    }
+  };
+}
