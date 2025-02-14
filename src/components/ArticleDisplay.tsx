@@ -10,7 +10,7 @@ interface ArticleDisplayProps {
 }
 
 function ArticleDisplay({ initialArticleNumber }: ArticleDisplayProps) {
-  const { currentPage, content, handleNextPage, handlePrevPage } =
+  const { currentPage, content, handleNextPage, handlePrevPage, isLoading } =
     usePagination(parseInt(initialArticleNumber as string));
   const { textSize } = useSettings();
 
@@ -27,10 +27,15 @@ function ArticleDisplay({ initialArticleNumber }: ArticleDisplayProps) {
 
   return (
     <div className="content">
-      <div
-        style={{ fontSize: `${textSize}px` }}
-        dangerouslySetInnerHTML={{ __html: content }}
-      />
+      {isLoading ? (
+        <div className="text-center text-3xl">Loading...</div>
+      ) : (
+        <div
+          style={{ fontSize: `${textSize}px` }}
+          dangerouslySetInnerHTML={{ __html: content }}
+        />
+      )}
+
       <div className="mt-8">
         <button onClick={debouncedHandlePrevPage} disabled={currentPage <= 1}>
           <Icon
