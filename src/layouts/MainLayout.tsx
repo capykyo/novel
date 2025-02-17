@@ -1,6 +1,5 @@
 import { Header, Footer } from "@/components/layout";
 import GlobalSettingsButton from "@/components/GlobalSettingsButton";
-import { useSettings } from "../contexts/SettingsContext";
 import { useState, useEffect } from "react";
 
 interface MainLayoutProps {
@@ -8,7 +7,6 @@ interface MainLayoutProps {
 }
 
 const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
-  const { theme } = useSettings();
   const [isArticlePage, setIsArticlePage] = useState(false);
 
   useEffect(() => {
@@ -16,9 +14,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   }, []);
   return (
     <div
-      className={`min-h-screen flex flex-col transition-colors duration-500 ease-in-out ${
-        theme === "day" ? "day-theme" : "night-theme"
-      }`}
+      className={`min-h-screen flex flex-col transition-colors duration-500 ease-in-out dark:bg-black dark:text-white`}
     >
       {/* Header */}
       <Header />
