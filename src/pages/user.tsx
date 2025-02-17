@@ -36,7 +36,7 @@ const features = [
     description: "文章简介",
     href: "/article?initialArticleNumber=1",
     cta: "继续阅读",
-    background: <img className="absolute -right-20 -top-20 opacity-60" />,
+    background: "",
     className: "lg:row-start-1 lg:row-end-4 lg:col-start-2 lg:col-end-3",
   },
   {
