@@ -1,12 +1,5 @@
-import Link from "next/link";
 import MainLayout from "../layouts/MainLayout";
-import {
-  BellIcon,
-  CalendarIcon,
-  FileTextIcon,
-  GlobeIcon,
-  InputIcon,
-} from "@radix-ui/react-icons";
+import { CalendarIcon, FileTextIcon, InputIcon } from "@radix-ui/react-icons";
 import { cn } from "@/lib/utils";
 
 import { BentoCard, BentoGrid } from "@/components/magicui/bento-grid";

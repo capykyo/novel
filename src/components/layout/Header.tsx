@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { Icon } from "@iconify-icon/react";
 import { useSettings } from "@/contexts/SettingsContext";
 

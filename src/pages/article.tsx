@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { usePagination } from "@/utils/paginationCache";
-import { useRouter } from "next/router";
 import { Icon } from "@iconify-icon/react";
 import { useSettings } from "@/contexts/SettingsContext";
 import cookie from "js-cookie";
@@ -8,7 +7,9 @@ import { debounce, cleanHtmlContent } from "@/utils/helper";
 import type { GetServerSideProps } from "next";
 import MainLayout from "../layouts/MainLayout";
 
-function getInitialArticleNumber(articleNumberFromServer?: string | null): number {
+function getInitialArticleNumber(
+  articleNumberFromServer?: string | null
+): number {
   if (typeof window !== "undefined") {
     const savedNumber = localStorage.getItem("articleNumber");
     return savedNumber
@@ -33,7 +34,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   };
 };
 
-function ArticlePage({ articleNumberFromServer }: { articleNumberFromServer: string | null }) {
+function ArticlePage({
+  articleNumberFromServer,
+}: {
+  articleNumberFromServer: string | null;
+}) {
   const initialArticleNumber = getInitialArticleNumber(articleNumberFromServer);
   const { currentPage, content, handleNextPage, handlePrevPage, isLoading } =
     usePagination(initialArticleNumber); // 使用初始文章编号
@@ -50,7 +55,8 @@ function ArticlePage({ articleNumberFromServer }: { articleNumberFromServer: str
   const debouncedHandleNextPage = debounce(handleNextPage, 300);
 
   // 使用 cleanHtmlContent 处理 content
-  const cleanedContent = typeof window !== "undefined" ? cleanHtmlContent(content) : content;
+  const cleanedContent =
+    typeof window !== "undefined" ? cleanHtmlContent(content) : content;
 
   return (
     <MainLayout>
@@ -86,4 +92,4 @@ function ArticlePage({ articleNumberFromServer }: { articleNumberFromServer: str
   );
 }
 
-export default ArticlePage; 
+export default ArticlePage;
