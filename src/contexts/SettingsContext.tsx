@@ -18,7 +18,7 @@ interface SettingsProviderProps {
 }
 
 const defaultSettings = {
-  theme: "day", // 默认为白天模式
+  theme: "light", // 默认为白天模式
   textSize: 16,
 };
 
@@ -37,7 +37,16 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({
   });
 
   const toggleTheme = useCallback(() => {
-    const newTheme = settings.theme === "day" ? "night" : "day";
+    const newTheme = settings.theme === "light" ? "dark" : "light";
+
+    // 更新 HTML 根元素的 class
+    if (newTheme === "dark") {
+      document.documentElement.classList.add("dark");
+      document.documentElement.classList.remove("light"); // 确保移除 light 类
+    } else {
+      document.documentElement.classList.remove("dark");
+      document.documentElement.classList.add("light"); // 确保添加 light 类
+    }
     setSettings((prev) => ({ ...prev, theme: newTheme }));
   }, [settings.theme]);
 

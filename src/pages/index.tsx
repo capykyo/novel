@@ -1,58 +1,53 @@
 import Link from "next/link";
-import MainLayout from "../layouts/MainLayout"; import {
-  BellIcon,
-  CalendarIcon,
-  FileTextIcon,
-  GlobeIcon,
-  InputIcon,
-} from "@radix-ui/react-icons";
+import MainLayout from "@/layouts/MainLayout";
+import { DotPattern } from "@/components/magicui/dot-pattern";
+import { ShinyButton } from "@/components/magicui/shiny-button";
 
-import { BentoCard, BentoGrid } from "@/components/magicui/bento-grid";
+export function ShinyButtonDemo() {
+  return <ShinyButton>Shiny Button</ShinyButton>;
+}
 
-const features = [
-  {
-    Icon: FileTextIcon,
-    name: "正在阅读: ",
-    description: "文章简介",
-    href: "/article?initialArticleNumber=1",
-    cta: "继续阅读",
-    background: <img className="absolute -right-20 -top-20 opacity-60" />,
-    className: "lg:row-start-1 lg:row-end-4 lg:col-start-2 lg:col-end-3",
-  },
-  {
-    Icon: InputIcon,
-    name: "更换新书",
-    description: "当前书籍已经阅读完毕",
-    href: "/add-book",
-    cta: "替换",
-    background: <img className="absolute -right-20 -top-20 opacity-60" />,
-    className: "lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-3",
-  },
-  {
-    Icon: CalendarIcon,
-    name: "阅读时长控制",
-    description: "设置阅读时长",
-    href: "/settings",
-    cta: "设置",
-    background: <img className="absolute -right-20 -top-20 opacity-60" />,
-    className: "lg:col-start-3 lg:col-end-3 lg:row-start-1 lg:row-end-2",
-  }
-];
+import { cn } from "@/lib/utils";
 
 function HomePage() {
   return (
     <MainLayout>
-      <div>
-        <h1>魔法阅读，一个AI赋能的阅读器</h1>
-        <p>
-          3大核心功能
-        </p>
+      <div className="absolute top-0 left-0 w-full min-h-screen opacity-30">
+        <DotPattern
+          width={10}
+          height={10}
+          cx={1}
+          cy={1}
+          cr={1}
+          className={cn(
+            "[mask-image:linear-gradient(to_bottom,white,transparent,transparent)] "
+          )}
+        />
       </div>
-      <BentoGrid className="lg:grid-rows-3">
-        {features.map((feature) => (
-          <BentoCard key={feature.name} {...feature} />
-        ))}
-      </BentoGrid>
+      <div className="flex flex-col items-start justify-center p-8 gap-y-10">
+        <h1 className="text-4xl font-bold">
+          <p className="leading-[1.6]">魔法阅读</p>
+          <p className="leading-[1.6]">一个AI赋能的阅读器</p>
+        </h1>
+        <div className="text-lg">
+          <p className="">
+            <span className="underline underline-offset-4">高效</span>
+            <span>，</span>
+            <span className="underline underline-offset-4">阅读时长监控</span>
+            <span>，</span>
+            <span className="underline underline-offset-4">AI赋能</span>
+            <span>，</span>
+            <span className="underline underline-offset-4">轻易部署</span>
+            <span>，</span>
+            <span className="">通过大模型API实现</span>
+          </p>
+        </div>
+        <div className="">
+          <Link href="/user">
+            <ShinyButton>Try it now</ShinyButton>
+          </Link>
+        </div>
+      </div>
     </MainLayout>
   );
 }
