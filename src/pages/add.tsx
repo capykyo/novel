@@ -81,12 +81,17 @@ function AddPage() {
                 const bookUrlInput = document.getElementById(
                   "bookUrl"
                 ) as HTMLInputElement;
-                if (bookUrlInput) {
+                if (bookUrlInput.value) {
                   localStorage.setItem("bookUrl", bookUrlInput.value);
 
                   toast({
                     title: "添加成功",
                     description: "文章链接：" + bookUrlInput.value,
+                  });
+                } else {
+                  toast({
+                    title: "添加失败",
+                    description: "请输入正确的文章链接",
                   });
                 }
               }}
