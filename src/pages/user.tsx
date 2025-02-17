@@ -43,7 +43,7 @@ const features = [
     Icon: InputIcon,
     name: "更换新书",
     description: "当前书籍已经阅读完毕",
-    href: "/add-book",
+    href: "/add",
     cta: "替换",
     background: (
       <Marquee
