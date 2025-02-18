@@ -36,7 +36,7 @@ function Book({ bookUrl }: { bookUrl: string }) {
             <CardTitle>{data.title}</CardTitle>
           </CardHeader>
           <CardContent className="flex gap-x-2">
-            <Image src={data.img} alt={data.title} />
+            <Image src={data.img} alt={data.title} width={60} height={160} />
             <div className="flex flex-col gap-y-2">
               <p>{data.description}</p>
               <p>最后一章节: {data.lastChapterNumber}</p>

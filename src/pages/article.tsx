@@ -17,7 +17,7 @@ function getInitialArticleNumber(
     const savedNumber = localStorage.getItem("articleNumber");
     return savedNumber
       ? parseInt(savedNumber, 10)
-      : parseInt(articleNumberFromServer || "649", 10);
+      : parseInt(articleNumberFromServer || initNumber.toString(), 10);
   }
   // 如果在服务端，返回默认值
   return parseInt(articleNumberFromServer || "1", 10);
