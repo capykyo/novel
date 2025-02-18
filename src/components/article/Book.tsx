@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useBookContext } from "@/contexts/BookContext";
 import { useEffect } from "react";
 import cookie from "js-cookie";
+import Image from "next/image";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -35,7 +36,7 @@ function Book({ bookUrl }: { bookUrl: string }) {
             <CardTitle>{data.title}</CardTitle>
           </CardHeader>
           <CardContent className="flex gap-x-2">
-            <img src={data.img} alt={data.title} />
+            <Image src={data.img} alt={data.title} />
             <div className="flex flex-col gap-y-2">
               <p>{data.description}</p>
               <p>最后一章节: {data.lastChapterNumber}</p>

@@ -7,6 +7,13 @@ import { Marquee } from "@/components/magicui/marquee";
 import { SpinningText } from "@/components/magicui/spinning-text";
 import { useBookContext } from "@/contexts/BookContext";
 
+interface BookInfo {
+  title: string;
+  img: string;
+  description: string;
+  url: string;
+}
+
 const files = [
   {
     name: "《比特币革命：数字货币时代的新机遇与挑战》",
@@ -89,8 +96,11 @@ const features = [
     className: "lg:col-start-3 lg:col-end-3 lg:row-start-1 lg:row-end-2",
   },
 ];
-
-export async function getServerSideProps(context: any) {
+// ./src/pages/user.tsx
+// ... existing code ...
+export async function getServerSideProps(context: {
+  req: { cookies: { bookInfo: string } };
+}) {
   const bookInfoFromCookie = context.req.cookies.bookInfo
     ? JSON.parse(decodeURIComponent(context.req.cookies.bookInfo))
     : null;
@@ -102,30 +112,36 @@ export async function getServerSideProps(context: any) {
   };
 }
 
-function UserPage({ bookInfoFromCookie }: { bookInfoFromCookie: any }) {
+function UserPage({
+  bookInfoFromCookie,
+}: {
+  bookInfoFromCookie: BookInfo | null; // 确保类型为 BookInfo
+}) {
   const { bookInfo, setBookInfo } = useBookContext();
-  let imgSrc = "";
-  let imgAlt = "";
-  let description = "";
-  let href = "";
+  let imgSrc: string = "";
+  let imgAlt: string = "";
+  let description: string = "";
+  let href: string = "";
 
   // 提取函数以获取书籍信息
-  const getBookInfo = (info: any) => {
+  const getBookInfo = (info: BookInfo | null) => {
+    // 确保参数类型为 BookInfo
     imgSrc = info?.img || "/images/default-book.png";
     imgAlt = info?.title || "默认书籍";
     description = info?.description || "默认书籍简介";
-    href = info ? `/article?initialArticleNumber=1&url=${info?.url}` : "";
+    href = info ? `/article?initialArticleNumber=1&url=${info?.url || ""}` : "";
   };
 
   // 根据优先级获取书籍信息
   if (bookInfo) {
     getBookInfo(bookInfo);
   } else if (bookInfoFromCookie) {
-    getBookInfo(bookInfoFromCookie);
+    getBookInfo(bookInfoFromCookie as BookInfo); // 使用类型断言
   } else {
     getBookInfo(null);
   }
 
+  // 更新 features[0]
   features[0].background = (
     <div
       className="absolute top-0 left-0 w-full h-full bg-cover bg-center opacity-20"
@@ -138,20 +154,10 @@ function UserPage({ bookInfoFromCookie }: { bookInfoFromCookie: any }) {
 
   useEffect(() => {
     if (bookInfoFromCookie) {
-      setBookInfo(bookInfoFromCookie);
-      // 直接在这里更新 features[0]
-      getBookInfo(bookInfoFromCookie);
-      features[0].background = (
-        <div
-          className="absolute top-0 left-0 w-full h-full bg-cover bg-center opacity-20"
-          style={{ backgroundImage: `url(${imgSrc})` }}
-        ></div>
-      );
-      features[0].name = "阅读: " + imgAlt;
-      features[0].description = description;
-      features[0].href = href;
+      setBookInfo(bookInfoFromCookie as BookInfo); // 使用类型断言
+      getBookInfo(bookInfoFromCookie as BookInfo); // 使用类型断言
     }
-  }, [bookInfoFromCookie, setBookInfo]);
+  }, [bookInfoFromCookie, setBookInfo, description, imgAlt, imgSrc, href]);
 
   return (
     <MainLayout>
