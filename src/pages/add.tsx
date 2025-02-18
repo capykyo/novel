@@ -24,6 +24,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { debounce, throttle } from "@/utils/helper";
 import { Book } from "@/components/article";
+import cookie from "js-cookie";
 function AddPage() {
   const { toast } = useToast();
   const [bookUrl, setBookUrl] = useState("");
@@ -33,6 +34,9 @@ function AddPage() {
       title: "添加成功",
       description: "文章链接：" + bookUrl,
     });
+    //清除cookie以及localstorage
+    cookie.remove("articleNumber");
+    localStorage.removeItem("articleNumber");
   };
 
   const handleReset = () => {
