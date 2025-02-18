@@ -4,7 +4,11 @@ import axios from "axios";
 import { JSDOM } from "jsdom";
 
 type Data = {
-  content?: string;
+  title?: string;
+  img?: string;
+  description?: string;
+  lastChapterNumber?: string;
+  url?: string;
   error?: string;
 };
 
@@ -12,15 +16,15 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  const { url, number } = req.query;
+  const { url } = req.query;
 
-  if (!number || typeof number !== "string") {
-    return res.status(400).json({ error: "Invalid article number" });
+  if (!url || typeof url !== "string") {
+    return res.status(400).json({ error: "Invalid book url" });
   }
 
   try {
     // 使用Axios发起GET请求
-    const response = await axios.get(`${url}${number}.html`, {
+    const response = await axios.get(`${url}/list.html`, {
       headers: {
         "User-Agent": "PostmanRuntime/7.43.0", // 设置合适的User-Agent
       },
@@ -28,19 +32,33 @@ export default async function handler(
 
     // 解析HTML文档并提取文章内容
     const dom = new JSDOM(response.data);
-    const document = dom.window.document;
+    const body = dom.window.document.body;
 
-    // 注意：这里的选择器需要根据实际网页结构调整
-    const articleContent = document.querySelector(".main")?.innerHTML || "";
+    const title = body.querySelector(".list2 h3 span");
+    const img = body.querySelector(".list2 img") as HTMLImageElement;
+    const description = body.querySelector(".description p");
+    // 从章节列表获取最后一章的页数
+    const lastChapter = body.querySelectorAll(
+      ".list3 li:last-child a"
+    )[1] as HTMLAnchorElement;
+    const lastChapterUrl = lastChapter.toString();
+    const chapterNumberMatch = lastChapterUrl.match(/(\d+)/);
+    const lastChapterNumber = chapterNumberMatch ? chapterNumberMatch[0] : "";
 
-    if (!articleContent) {
+    if (!title || !img || !description || !lastChapterNumber) {
       throw new Error(
         "Failed to find article content using the specified selector."
       );
     }
 
     // 返回文章内容
-    res.status(200).json({ content: articleContent });
+    res.status(200).json({
+      title: title?.textContent || "",
+      img: img?.src || "",
+      description: description?.textContent || "",
+      lastChapterNumber: lastChapterNumber || "",
+      url: url || "",
+    });
   } catch (error) {
     console.error("Detailed error information:", error);
     let errorMessage = "Failed to fetch or parse the article.";

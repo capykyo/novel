@@ -1,10 +1,11 @@
 import MainLayout from "../layouts/MainLayout";
 import { CalendarIcon, FileTextIcon, InputIcon } from "@radix-ui/react-icons";
 import { cn } from "@/lib/utils";
-
+import { useEffect } from "react";
 import { BentoCard, BentoGrid } from "@/components/magicui/bento-grid";
 import { Marquee } from "@/components/magicui/marquee";
 import { SpinningText } from "@/components/magicui/spinning-text";
+import { useBookContext } from "@/contexts/BookContext";
 
 const files = [
   {
@@ -34,7 +35,7 @@ const features = [
     Icon: FileTextIcon,
     name: "正在阅读: ",
     description: "文章简介",
-    href: "/article?initialArticleNumber=1",
+    href: "",
     cta: "继续阅读",
     background: "",
     className: "lg:row-start-1 lg:row-end-4 lg:col-start-2 lg:col-end-3",
@@ -89,7 +90,69 @@ const features = [
   },
 ];
 
-function UserPage() {
+export async function getServerSideProps(context: any) {
+  const bookInfoFromCookie = context.req.cookies.bookInfo
+    ? JSON.parse(decodeURIComponent(context.req.cookies.bookInfo))
+    : null;
+
+  return {
+    props: {
+      bookInfoFromCookie,
+    },
+  };
+}
+
+function UserPage({ bookInfoFromCookie }: { bookInfoFromCookie: any }) {
+  const { bookInfo, setBookInfo } = useBookContext();
+  let imgSrc = "";
+  let imgAlt = "";
+  let description = "";
+  let href = "";
+
+  // 提取函数以获取书籍信息
+  const getBookInfo = (info: any) => {
+    imgSrc = info?.img || "/images/default-book.png";
+    imgAlt = info?.title || "默认书籍";
+    description = info?.description || "默认书籍简介";
+    href = info ? `/article?initialArticleNumber=1&url=${info?.url}` : "";
+  };
+
+  // 根据优先级获取书籍信息
+  if (bookInfo) {
+    getBookInfo(bookInfo);
+  } else if (bookInfoFromCookie) {
+    getBookInfo(bookInfoFromCookie);
+  } else {
+    getBookInfo(null);
+  }
+
+  features[0].background = (
+    <div
+      className="absolute top-0 left-0 w-full h-full bg-cover bg-center opacity-20"
+      style={{ backgroundImage: `url(${imgSrc})` }}
+    ></div>
+  );
+  features[0].name = "阅读: " + imgAlt;
+  features[0].description = description;
+  features[0].href = href;
+
+  useEffect(() => {
+    if (bookInfoFromCookie) {
+      setBookInfo(bookInfoFromCookie);
+      // 直接在这里更新 features[0]
+      getBookInfo(bookInfoFromCookie);
+      features[0].background = (
+        <div
+          className="absolute top-0 left-0 w-full h-full bg-cover bg-center opacity-20"
+          style={{ backgroundImage: `url(${imgSrc})` }}
+        ></div>
+      );
+      features[0].name = "阅读: " + imgAlt;
+      features[0].description = description;
+      features[0].href = href;
+    }
+  }, [bookInfoFromCookie, setBookInfo]);
+
   return (
     <MainLayout>
       <BentoGrid className="lg:grid-rows-3">

@@ -1,14 +1,17 @@
 // utils/paginationCache.ts
-import useSWR from 'swr';
+import useSWR from "swr";
 import { useState } from "react";
 
-const fetcher = (url: string) => fetch(url).then(res => res.json());
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-export function usePagination(initialPage: number) {
+export function usePagination(initialPage: number, url: string) {
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
-  
+
   // 使用SWR来获取文章数据
-  const { data, error } = useSWR(`/api/fetchArticle?number=${currentPage}`, fetcher);
+  const { data, error } = useSWR(
+    `/api/fetchArticle?number=${currentPage}&url=${url}`,
+    fetcher
+  );
 
   const isLoading = !data && !error; // 判断是否正在加载
 
