@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useRouter } from "next/router";
 import { usePagination } from "@/utils/paginationCache";
 import { Icon } from "@iconify-icon/react";
 import { useSettings } from "@/contexts/SettingsContext";
@@ -6,8 +7,10 @@ import cookie from "js-cookie";
 import { debounce, cleanHtmlContent } from "@/utils/helper";
 import type { GetServerSideProps } from "next";
 import MainLayout from "../layouts/MainLayout";
+import { useBookContext } from "@/contexts/BookContext";
 
 function getInitialArticleNumber(
+  initNumber: number,
   articleNumberFromServer?: string | null
 ): number {
   if (typeof window !== "undefined") {
@@ -39,9 +42,15 @@ function ArticlePage({
 }: {
   articleNumberFromServer: string | null;
 }) {
-  const initialArticleNumber = getInitialArticleNumber(articleNumberFromServer);
+  const router = useRouter();
+  const { initialArticleNumber } = router.query;
+  const { bookInfo } = useBookContext();
+  const initialNumber = getInitialArticleNumber(
+    parseInt(initialArticleNumber as string),
+    articleNumberFromServer
+  );
   const { currentPage, content, handleNextPage, handlePrevPage, isLoading } =
-    usePagination(initialArticleNumber); // 使用初始文章编号
+    usePagination(initialNumber, bookInfo?.url || "");
   const { textSize } = useSettings();
 
   useEffect(() => {

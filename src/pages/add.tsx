@@ -21,9 +21,28 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { useToast } from "@/hooks/use-toast";
-
+import { useState } from "react";
+import { debounce, throttle } from "@/utils/helper";
+import { Book } from "@/components/article";
 function AddPage() {
   const { toast } = useToast();
+  const [bookUrl, setBookUrl] = useState("");
+
+  const handleSubmit = () => {
+    toast({
+      title: "添加成功",
+      description: "文章链接：" + bookUrl,
+    });
+  };
+
+  const handleReset = () => {
+    setBookUrl("");
+    toast({
+      title: "清除输入",
+      description: "输入已清除",
+    });
+  };
+
   return (
     <MainLayout>
       <div className="flex items-center justify-center flex-col gap-y-10 px-1">
@@ -56,51 +75,24 @@ function AddPage() {
                     id="bookUrl"
                     type="text"
                     placeholder="Enter your book url"
+                    value={bookUrl}
+                    onChange={throttle((e) => setBookUrl(e.target.value), 500)}
                   />
                 </div>
               </div>
             </form>
           </CardContent>
           <CardFooter className="flex justify-between">
-            <Button
-              variant="outline"
-              type="button"
-              onClick={() => {
-                if (document.getElementById("bookUrl")) {
-                  (
-                    document.getElementById("bookUrl") as HTMLInputElement
-                  ).value = "";
-                }
-              }}
-            >
+            <Button variant="outline" type="button" onClick={handleReset}>
               重置
             </Button>
-            <Button
-              type="button"
-              onClick={() => {
-                const bookUrlInput = document.getElementById(
-                  "bookUrl"
-                ) as HTMLInputElement;
-                if (bookUrlInput.value) {
-                  localStorage.setItem("bookUrl", bookUrlInput.value);
-
-                  toast({
-                    title: "添加成功",
-                    description: "文章链接：" + bookUrlInput.value,
-                  });
-                } else {
-                  toast({
-                    title: "添加失败",
-                    description: "请输入正确的文章链接",
-                  });
-                }
-              }}
-            >
+            <Button type="button" onClick={debounce(handleSubmit, 300)}>
               更新
             </Button>
           </CardFooter>
           <BorderBeam duration={8} size={100} />
         </Card>
+        <Book bookUrl={bookUrl} />
       </div>
     </MainLayout>
   );

@@ -7,11 +7,12 @@ import { debounce } from "@/utils/helper";
 
 interface ArticleDisplayProps {
   initialArticleNumber: string | number;
+  url: string;
 }
 
-function ArticleDisplay({ initialArticleNumber }: ArticleDisplayProps) {
+function ArticleDisplay({ initialArticleNumber, url }: ArticleDisplayProps) {
   const { currentPage, content, handleNextPage, handlePrevPage, isLoading } =
-    usePagination(parseInt(initialArticleNumber as string));
+    usePagination(parseInt(initialArticleNumber as string), url);
   const { textSize } = useSettings();
 
   // 使用useEffect并在其中检查是否为客户端环境

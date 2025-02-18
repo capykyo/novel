@@ -2,33 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-/* Tailwind does not support dynamic class names directly in JSX, so we define these classes here */
-.day-theme {
-  @apply bg-white text-stone-950;
-}
-
-.night-theme {
-  @apply bg-slate-900 text-gray-400; /* 深墨绿色可以用更具体的颜色代替，比如 #2e4057 */
-}
-
 @layer base {
   :root {
     --background: 0 0% 100%;
