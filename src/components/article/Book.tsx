@@ -1,50 +1,48 @@
 "use client";
-import useSWR from "swr";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useBookContext } from "@/contexts/BookContext";
-import { useEffect } from "react";
-import cookie from "js-cookie";
 import Image from "next/image";
+import { BookProps } from "@/types/book";
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+function Book({ book }: { book: BookProps }) {
+  // useEffect(() => {
+  //   if (data) {
+  //     const bookInfo = JSON.stringify(data);
+  //     localStorage.setItem("bookInfo", bookInfo);
+  //     cookie.set("bookInfo", bookInfo, { expires: 3650 });
+  //     setBookInfo(data);
+  //   }
+  // }, [data, setBookInfo]);
 
-function Book({ bookUrl }: { bookUrl: string }) {
-  const { data, error } = useSWR(
-    bookUrl ? `/api/fetchBookInfo?url=${bookUrl}` : null,
-    fetcher
-  );
-  const { setBookInfo } = useBookContext();
-
-  useEffect(() => {
-    if (data) {
-      const bookInfo = JSON.stringify(data);
-      localStorage.setItem("bookInfo", bookInfo);
-      cookie.set("bookInfo", bookInfo, { expires: 3650 });
-      setBookInfo(data);
-    }
-  }, [data, setBookInfo]);
-
-  if (error) return <div>加载失败</div>;
+  // if (error) return <div>加载失败</div>;
 
   return (
     <div>
-      {!data ? (
-        <div>等待加载...</div>
-      ) : (
-        <Card className="relative w-[350px] overflow-hidden">
-          <CardHeader>
-            <CardTitle>{data.title}</CardTitle>
-          </CardHeader>
-          <CardContent className="flex gap-x-2">
-            <Image src={data.img} alt={data.title} width={60} height={160} />
-            <div className="flex flex-col gap-y-2">
-              <p>{data.description}</p>
-              <p>最后一章节: {data.lastChapterNumber}</p>
-              <p>书籍地址: {data.url}</p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      <Card className="relative w-[350px] overflow-hidden">
+        <CardHeader>
+          <CardTitle>{book.title}</CardTitle>
+        </CardHeader>
+        <CardContent className="flex gap-x-2">
+          <Image
+            className="grow"
+            src={book.img || "/default.png"}
+            alt={book.title || "无题"}
+            width={120}
+            height={160}
+            priority
+          />
+          <div className="flex flex-col gap-y-2 w-[170px]">
+            <p className="text-sm text-gray-500 max-h-[100px] overflow-hidden line-clamp-5">
+              {book.description}
+            </p>
+            <p className="text-sm">最后一章节: {book.lastChapterNumber}</p>
+            <p className="text-sm text-blue-500 underline underline-offset-4 cursor-pointer">
+              <a href={book.url} target="_blank" rel="noreferrer">
+                书籍地址
+              </a>
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
