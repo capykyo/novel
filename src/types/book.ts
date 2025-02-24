@@ -1,6 +1,9 @@
-export interface BookInfo {
-  title: string;
-  author: string;
-  content: string;
-  // 其他属性...
+export interface BookProps {
+  title?: string;
+  author?: string;
+  description?: string;
+  img?: string;
+  lastChapterNumber?: string;
+  url?: string;
+  currentChapter?: string;
 }

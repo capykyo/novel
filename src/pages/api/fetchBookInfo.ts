@@ -2,13 +2,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
 import { JSDOM } from "jsdom";
+import { BookProps } from "@/types/book";
 
-type Data = {
-  title?: string;
-  img?: string;
-  description?: string;
-  lastChapterNumber?: string;
-  url?: string;
+type Data = BookProps & {
   error?: string;
 };
 
@@ -58,6 +54,7 @@ export default async function handler(
       description: description?.textContent || "",
       lastChapterNumber: lastChapterNumber || "",
       url: url || "",
+      currentChapter: "1",
     });
   } catch (error) {
     console.error("Detailed error information:", error);
