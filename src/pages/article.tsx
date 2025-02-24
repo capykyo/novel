@@ -85,10 +85,10 @@ function ArticlePage({
 
   const handleSwipe = () => {
     const distance = touchStartX.current - touchEndX.current;
-    if (distance > 50) {
+    if (distance > 150) {
       // 向左滑动，翻到下一页
       handleNextPage();
-    } else if (distance < -50) {
+    } else if (distance < -150) {
       // 向右滑动，翻到上一页
       handlePrevPage();
     }
@@ -140,7 +140,10 @@ function ArticlePage({
             />
           </button>
 
-          <button onClick={debounce(handleNextPage, 300)}>
+          <button
+            onClick={debounce(handleNextPage, 300)}
+            disabled={currentPage >= Number(book?.lastChapterNumber)}
+          >
             <Icon
               icon="ic:baseline-keyboard-double-arrow-right"
               width="36"
