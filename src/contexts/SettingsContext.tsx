@@ -4,6 +4,8 @@ import {
   useContext,
   ReactNode,
   useCallback,
+  useEffect,
+  useLayoutEffect,
 } from "react";
 
 interface Settings {
@@ -28,6 +30,16 @@ const SettingsContext = createContext<Settings>({
   setTextSize: () => {},
 });
 
+const updateThemeClasses = (theme: string) => {
+  if (theme === "dark") {
+    document.documentElement.classList.add("dark");
+    document.documentElement.classList.remove("light"); // 确保移除 light 类
+  } else {
+    document.documentElement.classList.remove("dark");
+    document.documentElement.classList.add("light"); // 确保添加 light 类
+  }
+};
+
 export const SettingsProvider: React.FC<SettingsProviderProps> = ({
   children,
 }) => {
@@ -38,20 +50,24 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({
 
   const toggleTheme = useCallback(() => {
     const newTheme = settings.theme === "light" ? "dark" : "light";
-
-    // 更新 HTML 根元素的 class
-    if (newTheme === "dark") {
-      document.documentElement.classList.add("dark");
-      document.documentElement.classList.remove("light"); // 确保移除 light 类
-    } else {
-      document.documentElement.classList.remove("dark");
-      document.documentElement.classList.add("light"); // 确保添加 light 类
-    }
+    updateThemeClasses(newTheme); // 调用抽离的函数
     setSettings((prev) => ({ ...prev, theme: newTheme }));
   }, [settings.theme]);
 
   const setTextSize = useCallback((size: number) => {
     setSettings((prev) => ({ ...prev, textSize: size }));
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("settings", JSON.stringify(settings));
+  }, [settings]);
+
+  useLayoutEffect(() => {
+    const savedSettings = JSON.parse(localStorage.getItem("settings") || "{}");
+    if (savedSettings) {
+      setSettings(savedSettings);
+      updateThemeClasses(savedSettings.theme);
+    }
   }, []);
 
   return (
