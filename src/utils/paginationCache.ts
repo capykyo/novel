@@ -1,80 +1,21 @@
 // utils/paginationCache.ts
-import { useState, useEffect, useCallback } from "react";
+import useSWR from "swr";
+import { useState } from "react";
 
-function cleanHtmlContent(htmlString: string): string {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(htmlString, "text/html");
-  const body = doc.body;
-  const allElements = doc.body.querySelectorAll("*");
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-  const adElement = body.querySelector("#ad");
-
-  if (adElement) {
-    adElement.remove();
-  }
-
-  const pageListElement = body.querySelector(".list_page");
-
-  if (pageListElement) {
-    pageListElement.remove();
-  }
-
-  allElements.forEach((element) => {
-    element.removeAttribute("class");
-    Array.from(element.attributes).forEach((attr) => {
-      if (attr.name.startsWith("item")) {
-        element.removeAttribute(attr.name);
-      }
-    });
-  });
-
-  return doc.body.innerHTML;
-}
-
-function scrollToTop() {
-  window.scrollTo({ top: 0 });
-}
-
-export function usePagination(initialPage: number) {
+export function usePagination(initialPage: number, url: string) {
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
-  const [content, setContent] = useState<string>("");
-  const [cache, setCache] = useState<Map<number, string>>(new Map());
 
-  // 使用useCallback记忆fetchArticle函数
-  const fetchArticle = useCallback(
-    async (page: number) => {
-      if (cache.has(page)) {
-        setContent(cache.get(page) || "");
-        return;
-      }
-
-      try {
-        const response = await fetch(`/api/fetchArticle?number=${page}`);
-        const data = await response.json();
-
-        if (response.ok && data.content) {
-          const cleanedContent = cleanHtmlContent(data.content);
-          setContent(cleanedContent);
-
-          const updatedCache = new Map(cache);
-          updatedCache.set(page, cleanedContent);
-          setCache(updatedCache);
-        } else {
-          console.error("Error fetching article:", data.error);
-        }
-      } catch (error) {
-        console.error("Failed to fetch article:", error);
-      }
-    },
-    [cache]
+  // 使用SWR来获取文章数据
+  const { data, error } = useSWR(
+    `/api/fetchArticle?number=${currentPage}&url=${url}`,
+    fetcher
   );
 
-  useEffect(() => {
-    fetchArticle(currentPage);
-  }, [currentPage, fetchArticle]);
+  const isLoading = !data && !error; // 判断是否正在加载
 
   const handleNextPage = () => {
-    scrollToTop();
     setCurrentPage((prev) => prev + 1);
   };
 
@@ -86,8 +27,9 @@ export function usePagination(initialPage: number) {
 
   return {
     currentPage,
-    content,
+    content: data?.content || "",
     handleNextPage,
     handlePrevPage,
+    isLoading,
   };
 }

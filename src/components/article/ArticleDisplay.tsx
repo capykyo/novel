@@ -7,11 +7,12 @@ import { debounce } from "@/utils/helper";
 
 interface ArticleDisplayProps {
   initialArticleNumber: string | number;
+  url: string;
 }
 
-function ArticleDisplay({ initialArticleNumber }: ArticleDisplayProps) {
-  const { currentPage, content, handleNextPage, handlePrevPage } =
-    usePagination(parseInt(initialArticleNumber as string));
+function ArticleDisplay({ initialArticleNumber, url }: ArticleDisplayProps) {
+  const { currentPage, content, handleNextPage, handlePrevPage, isLoading } =
+    usePagination(parseInt(initialArticleNumber as string), url);
   const { textSize } = useSettings();
 
   // 使用useEffect并在其中检查是否为客户端环境
@@ -27,10 +28,15 @@ function ArticleDisplay({ initialArticleNumber }: ArticleDisplayProps) {
 
   return (
     <div className="content">
-      <div
-        style={{ fontSize: `${textSize}px` }}
-        dangerouslySetInnerHTML={{ __html: content }}
-      />
+      {isLoading ? (
+        <div className="text-center text-3xl">Loading...</div>
+      ) : (
+        <div
+          style={{ fontSize: `${textSize}px` }}
+          dangerouslySetInnerHTML={{ __html: content }}
+        />
+      )}
+
       <div className="mt-8">
         <button onClick={debouncedHandlePrevPage} disabled={currentPage <= 1}>
           <Icon
