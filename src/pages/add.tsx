@@ -136,7 +136,7 @@ function AddPage() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href="/user">控制台</BreadcrumbLink>
+              <BreadcrumbLink href="/controlpanel">控制台</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>

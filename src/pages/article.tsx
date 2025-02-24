@@ -1,77 +1,121 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { usePagination } from "@/utils/paginationCache";
 import { Icon } from "@iconify-icon/react";
 import { useSettings } from "@/contexts/SettingsContext";
-import cookie from "js-cookie";
 import { debounce, cleanHtmlContent } from "@/utils/helper";
-import type { GetServerSideProps } from "next";
 import MainLayout from "../layouts/MainLayout";
-import { useBookContext } from "@/contexts/BookContext";
+import { BookProps } from "@/types/book";
+import { ScrollProgress } from "@/components/magicui/scroll-progress";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
-function getInitialArticleNumber(
-  initNumber: number,
-  articleNumberFromServer?: string | null
-): number {
-  if (typeof window !== "undefined") {
-    const savedNumber = localStorage.getItem("articleNumber");
-    return savedNumber
-      ? parseInt(savedNumber, 10)
-      : parseInt(articleNumberFromServer || initNumber.toString(), 10);
-  }
-  // 如果在服务端，返回默认值
-  return parseInt(articleNumberFromServer || "1", 10);
-}
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  // 从 cookie 中获取 articleNumber
-  const articleNumberFromCookie =
-    context.req.cookies.articleNumber === undefined
-      ? null
-      : context.req.cookies.articleNumber;
+export async function getServerSideProps(context: any) {
+  const { initialArticleNumber, url } = context.query;
 
   return {
     props: {
-      articleNumberFromServer: articleNumberFromCookie,
+      initialArticleNumber,
+      url,
     },
   };
-};
+}
 
 function ArticlePage({
-  articleNumberFromServer,
+  initialArticleNumber,
+  url,
 }: {
-  articleNumberFromServer: string | null;
+  initialArticleNumber: string;
+  url: string;
 }) {
   const router = useRouter();
-  const { initialArticleNumber } = router.query;
-  const { bookInfo } = useBookContext();
-  const initialNumber = getInitialArticleNumber(
-    parseInt(initialArticleNumber as string),
-    articleNumberFromServer
-  );
-  const { currentPage, content, handleNextPage, handlePrevPage, isLoading } =
-    usePagination(initialNumber, bookInfo?.url || "");
-  const { textSize } = useSettings();
+  const {
+    initialArticleNumber: initialArticleNumberFromRouter,
+    url: urlFromRouter,
+  } = router.query;
 
+  const { currentPage, content, handleNextPage, handlePrevPage, isLoading } =
+    usePagination(
+      Number(initialArticleNumberFromRouter) || Number(initialArticleNumber),
+      (urlFromRouter as string) || (url as string)
+    );
+
+  const { textSize } = useSettings();
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
+  const [book, setBook] = useState<BookProps | null>(null);
+
+  // 处理翻页事件
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("articleNumber", currentPage.toString());
-      cookie.set("articleNumber", currentPage.toString());
+    localStorage.setItem("articleNumber", currentPage.toString());
+    const books: BookProps[] = JSON.parse(localStorage.getItem("bookInfo")!);
+    if (books.length > 0) {
+      const book = books[0];
+      book.currentChapter = currentPage.toString();
+      localStorage.setItem("bookInfo", JSON.stringify(books));
+      setBook(book);
+      router.push(`/article?initialArticleNumber=${currentPage}&url=${url}`);
     }
   }, [currentPage]);
-
-  const debouncedHandlePrevPage = debounce(handlePrevPage, 300);
-  const debouncedHandleNextPage = debounce(handleNextPage, 300);
 
   // 使用 cleanHtmlContent 处理 content
   const cleanedContent =
     typeof window !== "undefined" ? cleanHtmlContent(content) : content;
 
+  // 处理触摸事件
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    touchEndX.current = e.changedTouches[0].clientX;
+    handleSwipe();
+  };
+
+  const handleSwipe = () => {
+    const distance = touchStartX.current - touchEndX.current;
+    if (distance > 50) {
+      // 向左滑动，翻到下一页
+      handleNextPage();
+    } else if (distance < -50) {
+      // 向右滑动，翻到上一页
+      handlePrevPage();
+    }
+  };
+
   return (
     <MainLayout>
-      <div className="content">
+      <div
+        className="content"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        <ScrollProgress className="h-1" />
+        <Breadcrumb className="self-start mb-4">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">Home</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/controlpanel">控制台</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{book?.title}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
         {isLoading ? (
-          <div className="text-center text-3xl">Loading...</div>
+          <div className="flex justify-center items-center h-full">
+            <Icon icon="eos-icons:bubble-loading" width="48" height="48" />
+          </div>
         ) : (
           <div
             style={{ fontSize: `${textSize}px` }}
@@ -80,7 +124,10 @@ function ArticlePage({
         )}
 
         <div className="mt-8">
-          <button onClick={debouncedHandlePrevPage} disabled={currentPage <= 1}>
+          <button
+            onClick={debounce(handlePrevPage, 300)}
+            disabled={currentPage <= 1}
+          >
             <Icon
               icon="ic:baseline-keyboard-double-arrow-left"
               width="36"
@@ -88,7 +135,7 @@ function ArticlePage({
             />
           </button>
 
-          <button onClick={debouncedHandleNextPage}>
+          <button onClick={debounce(handleNextPage, 300)}>
             <Icon
               icon="ic:baseline-keyboard-double-arrow-right"
               width="36"
