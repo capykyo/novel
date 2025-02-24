@@ -1,7 +1,7 @@
 import MainLayout from "../layouts/MainLayout";
 import { CalendarIcon, FileTextIcon, InputIcon } from "@radix-ui/react-icons";
 import { cn } from "@/lib/utils";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { BentoCard, BentoGrid } from "@/components/magicui/bento-grid";
 import { Marquee } from "@/components/magicui/marquee";
 import { SpinningText } from "@/components/magicui/spinning-text";

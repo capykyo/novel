@@ -16,7 +16,12 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 
-export async function getServerSideProps(context: any) {
+interface ServerSideProps {
+  initialArticleNumber: string;
+  url: string;
+}
+
+export async function getServerSideProps(context: { query: ServerSideProps }) {
   const { initialArticleNumber, url } = context.query;
 
   return {
