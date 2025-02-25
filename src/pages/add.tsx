@@ -58,7 +58,9 @@ function AddPage() {
           if (state.length >= MAX_HISTORY_COUNT) {
             return state.slice(0, MAX_HISTORY_COUNT - 1);
           }
-          return [action.book, ...state];
+          const newBooks = [action.book, ...state];
+          localStorage.setItem("bookInfo", JSON.stringify(newBooks));
+          return newBooks;
         }
         return state;
       default:
@@ -105,10 +107,6 @@ function AddPage() {
       booksDispatch({ type: "init", books: storedBooks });
     }
   }, []);
-
-  useEffect(() => {
-    localStorage.setItem("bookInfo", JSON.stringify(books));
-  }, [books]);
 
   // 当input输入框输入内容时，调用
   useEffect(() => {
