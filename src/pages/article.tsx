@@ -15,6 +15,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import ReadingTimer from "@/components/ReadingTimer";
 
 interface ServerSideProps {
   initialArticleNumber: string;
@@ -96,6 +97,7 @@ function ArticlePage({
 
   return (
     <MainLayout>
+      <ReadingTimer />
       <div
         className="content dark:text-stone-300 min-h-[calc(100vh-100px)] flex flex-col"
         onTouchStart={handleTouchStart}
