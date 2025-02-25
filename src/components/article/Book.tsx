@@ -2,6 +2,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 import { BookProps } from "@/types/book";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 function Book({ book }: { book: BookProps }) {
   // useEffect(() => {
@@ -31,15 +33,29 @@ function Book({ book }: { book: BookProps }) {
             priority
           />
           <div className="flex flex-col gap-y-2 w-[170px]">
-            <p className="text-sm text-gray-500 max-h-[100px] overflow-hidden line-clamp-5">
-              {book.description}
-            </p>
-            <p className="text-sm">最后一章节: {book.lastChapterNumber}</p>
-            <p className="text-sm text-blue-500 underline underline-offset-4 cursor-pointer">
-              <a href={book.url} target="_blank" rel="noreferrer">
-                书籍地址
-              </a>
-            </p>
+            <div className="grow">
+              <p className="text-sm text-gray-600 max-h-[100px] overflow-hidden line-clamp-5 dark:text-gray-400">
+                {book.description}
+              </p>
+              <p className="text-sm mt-2">
+                最后一章节: {book.lastChapterNumber}
+              </p>
+            </div>
+            <div className="flex justify-between w-full">
+              <Button variant="outline" size="sm">
+                <Link href={book.url!} target="_blank" rel="noreferrer">
+                  书籍地址
+                </Link>
+              </Button>
+              <Button variant="outline" size="sm">
+                <Link
+                  href={`/article?initialArticleNumber=${book.currentChapter}&url=${book.url}`}
+                  rel="noreferrer"
+                >
+                  继续阅读
+                </Link>
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
