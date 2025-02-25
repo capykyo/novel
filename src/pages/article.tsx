@@ -97,7 +97,7 @@ function ArticlePage({
   return (
     <MainLayout>
       <div
-        className="content"
+        className="content dark:text-stone-300"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
