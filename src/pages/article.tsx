@@ -97,7 +97,7 @@ function ArticlePage({
   return (
     <MainLayout>
       <div
-        className="content dark:text-stone-300"
+        className="content dark:text-stone-300 min-h-[calc(100vh-100px)] flex flex-col"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
@@ -118,11 +118,12 @@ function ArticlePage({
           </BreadcrumbList>
         </Breadcrumb>
         {isLoading ? (
-          <div className="flex justify-center items-center h-full">
+          <div className="grow flex justify-center items-center h-full">
             <Icon icon="eos-icons:bubble-loading" width="48" height="48" />
           </div>
         ) : (
           <div
+            className="grow"
             style={{ fontSize: `${textSize}px` }}
             dangerouslySetInnerHTML={{ __html: cleanedContent }}
           />
