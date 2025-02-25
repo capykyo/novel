@@ -6,17 +6,18 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 function Book({ book }: { book: BookProps }) {
-  // useEffect(() => {
-  //   if (data) {
-  //     const bookInfo = JSON.stringify(data);
-  //     localStorage.setItem("bookInfo", bookInfo);
-  //     cookie.set("bookInfo", bookInfo, { expires: 3650 });
-  //     setBookInfo(data);
-  //   }
-  // }, [data, setBookInfo]);
-
-  // if (error) return <div>加载失败</div>;
-
+  // 处理继续阅读的逻辑，当开始继续阅读时，需要将该本书插入到localStorage bookInfo中的第一项，并删除该本书
+  const handleContinueReading = () => {
+    const bookInfo = localStorage.getItem("bookInfo");
+    if (bookInfo) {
+      const bookInfoArray = JSON.parse(bookInfo);
+      const newArr = bookInfoArray.filter(
+        (item: BookProps) => item.url !== book.url
+      );
+      newArr.unshift(book);
+      localStorage.setItem("bookInfo", JSON.stringify(newArr));
+    }
+  };
   return (
     <div>
       <Card className="relative w-[350px] overflow-hidden">
@@ -47,7 +48,11 @@ function Book({ book }: { book: BookProps }) {
                   书籍地址
                 </Link>
               </Button>
-              <Button variant="outline" size="sm">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleContinueReading}
+              >
                 <Link
                   href={`/article?initialArticleNumber=${book.currentChapter}&url=${book.url}`}
                   rel="noreferrer"
