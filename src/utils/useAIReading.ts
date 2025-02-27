@@ -1,9 +1,36 @@
-import useSWR from "swr";
+import useSWR, { preload } from "swr";
+import { useEffect } from "react";
 import { removeWhitespaceAndNewlines, stripHtmlTags } from "@/utils/textFormat";
+
+// 预加载函数
+const prefetchAIContent = (content: string) => {
+  if (!content) return;
+
+  const processedContent = stripHtmlTags(removeWhitespaceAndNewlines(content));
+  const body = JSON.stringify({ prompt: processedContent });
+
+  preload(`/api/fetchAiContent`, async () => {
+    const response = await fetch(`/api/fetchAiContent`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body,
+    });
+
+    if (!response.ok) {
+      throw new Error("网络响应不正常");
+    }
+
+    const result = await response.json();
+    return result.content;
+  });
+};
 
 export function useAIReading(
   isAIReading: boolean,
-  content: string | undefined
+  content: string | undefined,
+  nextPageContent?: string | undefined
 ) {
   // 定义 fetcher 函数
   const fetcher = async () => {
@@ -41,6 +68,13 @@ export function useAIReading(
       fallbackData: "", // 默认为空字符串
     }
   );
+
+  // 如果提供了下一页内容，且当前页已加载完成，则预加载下一页的AI内容
+  useEffect(() => {
+    if (isAIReading && nextPageContent && data) {
+      prefetchAIContent(nextPageContent);
+    }
+  }, [isAIReading, nextPageContent, data]);
 
   return {
     data,

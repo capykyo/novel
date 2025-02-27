@@ -58,35 +58,33 @@ function ArticlePage({
       (urlFromRouter as string) || (url as string)
     );
 
+  const { content: nextPageContent } = usePagination(
+    currentPage + 1,
+    (urlFromRouter as string) || (url as string)
+  );
+
   const { textSize } = useSettings();
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
   const [book, setBook] = useState<BookProps | null>(null);
   const [useAIRead, setUseAIRead] = useState(false);
 
-  // 使用 useAIReading 获取AI处理后的内容
   const {
     data: aiContent,
     error,
     isLoading: aiLoading,
-  } = useAIReading(useAIRead, content);
+  } = useAIReading(useAIRead, content, nextPageContent);
 
-  // 在页面加载时，检查是否需要重置章节阅读记录
   useEffect(() => {
-    // 使用 url 作为书籍的唯一标识
     const currentBookUrl = url;
-
-    // 获取上次记录的书籍URL
     const lastBookUrl = localStorage.getItem("lastBookUrl");
 
-    // 如果切换了书籍，重置已阅读章节记录
     if (currentBookUrl && currentBookUrl !== lastBookUrl) {
       localStorage.setItem("readChapters", "[]");
       localStorage.setItem("lastBookUrl", currentBookUrl);
     }
   }, [url]);
 
-  // 处理翻页事件
   useEffect(() => {
     localStorage.setItem("articleNumber", currentPage.toString());
     const books: BookProps[] = JSON.parse(localStorage.getItem("bookInfo")!);
@@ -97,30 +95,23 @@ function ArticlePage({
       setBook(book);
       router.push(`/article?initialArticleNumber=${currentPage}&url=${url}`);
 
-      // 当翻页时，确保记录当前阅读进度
       if (useAIRead && aiContent) {
-        // 这里的逻辑在 TimeSaving 组件中处理
       }
     }
   }, [currentPage]);
 
-  // 使用 cleanHtmlContent 处理 content
   const cleanedContent =
     typeof window !== "undefined" ? cleanHtmlContent(content) : content;
 
-  // 计算原始内容字数
   const originalWordCount =
     typeof window !== "undefined"
       ? stripHtmlTags(removeWhitespaceAndNewlines(cleanedContent))
       : cleanedContent;
 
-  // 计算AI内容字数
   const aiWordCount = aiContent ? stripHtmlTags(aiContent) : "";
 
-  // 根据当前模式选择正确的字数计数
   const wordCount = useAIRead ? aiWordCount : originalWordCount;
 
-  // 处理触摸事件
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     touchStartX.current = e.touches[0].clientX;
   };
@@ -133,10 +124,8 @@ function ArticlePage({
   const handleSwipe = () => {
     const distance = touchStartX.current - touchEndX.current;
     if (distance > 150) {
-      // 向左滑动，翻到下一页
       handleNextPage();
     } else if (distance < -150) {
-      // 向右滑动，翻到上一页
       handlePrevPage();
     }
   };
@@ -152,7 +141,6 @@ function ArticlePage({
         <ReadingTime />
       </div>
 
-      {/* 只在AI内容可用时显示节省时间组件 */}
       {useAIRead && aiContent && !aiLoading && (
         <div className="mt-2 mb-4">
           <TimeSaving
