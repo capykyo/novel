@@ -15,6 +15,13 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import ReadingTime from "@/components/ReadingDuration";
+import EstimatedReadingTime from "@/components/EstimatedReadingTime";
+import { removeWhitespaceAndNewlines, stripHtmlTags } from "@/utils/textFormat";
+import { Button } from "@/components/ui/button";
+import MarkdownRenderer from "@/components/MarkdownRenderer";
+import { useAIReading } from "@/utils/useAIReading";
+import TimeSaving from "@/components/TimeSaving";
 
 interface ServerSideProps {
   initialArticleNumber: string;
@@ -51,12 +58,33 @@ function ArticlePage({
       (urlFromRouter as string) || (url as string)
     );
 
+  const { content: nextPageContent } = usePagination(
+    currentPage + 1,
+    (urlFromRouter as string) || (url as string)
+  );
+
   const { textSize } = useSettings();
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
   const [book, setBook] = useState<BookProps | null>(null);
+  const [useAIRead, setUseAIRead] = useState(false);
 
-  // 处理翻页事件
+  const { data: aiContent, isLoading: aiLoading } = useAIReading(
+    useAIRead,
+    content,
+    nextPageContent
+  );
+
+  useEffect(() => {
+    const currentBookUrl = url;
+    const lastBookUrl = localStorage.getItem("lastBookUrl");
+
+    if (currentBookUrl && currentBookUrl !== lastBookUrl) {
+      localStorage.setItem("readChapters", "[]");
+      localStorage.setItem("lastBookUrl", currentBookUrl);
+    }
+  }, [url]);
+
   useEffect(() => {
     localStorage.setItem("articleNumber", currentPage.toString());
     const books: BookProps[] = JSON.parse(localStorage.getItem("bookInfo")!);
@@ -66,14 +94,24 @@ function ArticlePage({
       localStorage.setItem("bookInfo", JSON.stringify(books));
       setBook(book);
       router.push(`/article?initialArticleNumber=${currentPage}&url=${url}`);
+
+      if (useAIRead && aiContent) {
+      }
     }
   }, [currentPage]);
 
-  // 使用 cleanHtmlContent 处理 content
   const cleanedContent =
     typeof window !== "undefined" ? cleanHtmlContent(content) : content;
 
-  // 处理触摸事件
+  const originalWordCount =
+    typeof window !== "undefined"
+      ? stripHtmlTags(removeWhitespaceAndNewlines(cleanedContent))
+      : cleanedContent;
+
+  const aiWordCount = aiContent ? stripHtmlTags(aiContent) : "";
+
+  const wordCount = useAIRead ? aiWordCount : originalWordCount;
+
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     touchStartX.current = e.touches[0].clientX;
   };
@@ -86,22 +124,39 @@ function ArticlePage({
   const handleSwipe = () => {
     const distance = touchStartX.current - touchEndX.current;
     if (distance > 150) {
-      // 向左滑动，翻到下一页
       handleNextPage();
     } else if (distance < -150) {
-      // 向右滑动，翻到上一页
       handlePrevPage();
     }
   };
 
+  const handleAIReading = () => {
+    setUseAIRead((prev) => !prev);
+  };
+
   return (
     <MainLayout>
+      <div className="flex justify-between items-center">
+        <EstimatedReadingTime wordCount={wordCount.length} />
+        <ReadingTime />
+      </div>
+
+      {useAIRead && aiContent && !aiLoading && (
+        <div className="mt-2 mb-4">
+          <TimeSaving
+            originalCount={originalWordCount.length}
+            aiCount={aiWordCount.length}
+            currentPage={currentPage}
+          />
+        </div>
+      )}
+
       <div
-        className="content"
+        className="content dark:text-stone-300 min-h-[calc(100vh-100px)] flex flex-col"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        <ScrollProgress className="h-1" />
+        <ScrollProgress />
         <Breadcrumb className="self-start mb-4">
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -117,15 +172,41 @@ function ArticlePage({
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
+        <Button
+          className="self-end mb-4"
+          onClick={handleAIReading}
+          variant="outline"
+        >
+          {useAIRead ? "关闭AI阅读" : "开启AI阅读"}
+        </Button>
         {isLoading ? (
-          <div className="flex justify-center items-center h-full">
+          <div className="grow flex justify-center items-center h-full">
             <Icon icon="eos-icons:bubble-loading" width="48" height="48" />
           </div>
         ) : (
-          <div
-            style={{ fontSize: `${textSize}px` }}
-            dangerouslySetInnerHTML={{ __html: cleanedContent }}
-          />
+          <>
+            {useAIRead ? (
+              aiLoading ? (
+                <div className="grow flex justify-center items-center h-full">
+                  <Icon
+                    icon="eos-icons:bubble-loading"
+                    width="48"
+                    height="48"
+                  />
+                </div>
+              ) : (
+                <div className="grow">
+                  <MarkdownRenderer content={aiContent || ""} />
+                </div>
+              )
+            ) : (
+              <div
+                className="grow"
+                style={{ fontSize: `${textSize}px` }}
+                dangerouslySetInnerHTML={{ __html: cleanedContent }}
+              />
+            )}
+          </>
         )}
 
         <div className="mt-8">

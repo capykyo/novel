@@ -82,8 +82,8 @@ function ControlPanelPage() {
       },
       {
         Icon: CalendarIcon,
-        name: "阅读时长控制",
-        description: "设置阅读时长",
+        name: "应用控制",
+        description: "设置AI模型、阅读时长、休息时长",
         href: "/settings",
         cta: "设置",
         background: (
