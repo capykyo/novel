@@ -1,10 +1,11 @@
-import { ChatOpenAIFields, ClientOptions } from "@langchain/openai";
+// import { ChatOpenAIFields, ClientOptions } from "@langchain/openai";
+import { ChatOpenAIFields } from "@langchain/openai";
 
-type OpenAIFields = {
-  model: string;
-  temperature?: number;
-  clientConfig: ClientOptions;
-};
+// type OpenAIFields = {
+//   model: string;
+//   temperature?: number;
+//   clientConfig: ClientOptions;
+// };
 
 export const langChainModelConfigs: ChatOpenAIFields[] = [
   {

@@ -69,11 +69,11 @@ function ArticlePage({
   const [book, setBook] = useState<BookProps | null>(null);
   const [useAIRead, setUseAIRead] = useState(false);
 
-  const {
-    data: aiContent,
-    error,
-    isLoading: aiLoading,
-  } = useAIReading(useAIRead, content, nextPageContent);
+  const { data: aiContent, isLoading: aiLoading } = useAIReading(
+    useAIRead,
+    content,
+    nextPageContent
+  );
 
   useEffect(() => {
     const currentBookUrl = url;
