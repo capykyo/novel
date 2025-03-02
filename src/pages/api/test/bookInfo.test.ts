@@ -4,13 +4,8 @@ import handler from "../bookInfo"; // Import your API handler
 import axios from "axios"; // Import axiosq
 import { bookInfo } from "./res";
 
-type ResType = {
-  title: string;
-  img: string;
-  description: string;
-  lastChapterNumber: string;
-  url: string;
-  currentChapter: string;
+type AxiosMock = {
+  mockResolvedValue: (value: { data: typeof bookInfo.resHtml }) => void;
 };
 
 // Mock axios
@@ -33,7 +28,7 @@ describe("API Handler", () => {
     } as unknown as NextApiResponse; // Type assertion
 
     // Mock the Axios GET request
-    (axios.get as any).mockResolvedValue({
+    (axios.get as unknown as AxiosMock).mockResolvedValue({
       data: bookInfo.resHtml, // Mocked response data
     });
 
