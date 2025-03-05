@@ -40,3 +40,8 @@ export function estimateReadingTime(
   // 四舍五入到最接近的秒数
   return Math.round(readingTimeInSeconds);
 }
+
+export const formatTime = (timestamp: number) => {
+  const date = new Date(timestamp);
+  return date.toLocaleString();
+};

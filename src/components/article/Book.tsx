@@ -54,7 +54,7 @@ function Book({ book }: { book: BookProps }) {
                 onClick={handleContinueReading}
               >
                 <Link
-                  href={`/article?initialArticleNumber=${book.currentChapter}&url=${book.url}`}
+                  href={`/article?number=${book.currentChapter}&url=${book.url}`}
                   rel="noreferrer"
                 >
                   继续阅读
