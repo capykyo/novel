@@ -67,7 +67,7 @@ export default function AiReadingPage({
       `/api/aiReader?number=${number}&url=${url}`
     );
 
-    eventSource.onopen = (event) => {
+    eventSource.onopen = () => {
       console.log("EventSource连接建立时间:", formatTime(Date.now()));
     };
 
