@@ -9,10 +9,13 @@ interface MainLayoutProps {
 }
 
 const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
-  const [isArticlePage, setIsArticlePage] = useState(false);
+  const [isSettingButtonShown, setIsSettingButtonShown] = useState(false);
 
   useEffect(() => {
-    setIsArticlePage(window.location.pathname === "/article");
+    setIsSettingButtonShown(
+      window.location.pathname === "/article" ||
+        window.location.pathname === "/aireading"
+    );
   }, []);
   return (
     <div
@@ -26,7 +29,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
       <Toaster />
 
-      {isArticlePage && <GlobalSettingsButton />}
+      {isSettingButtonShown && <GlobalSettingsButton />}
 
       {/* Footer */}
       <Footer />
