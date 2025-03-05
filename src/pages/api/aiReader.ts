@@ -2,10 +2,16 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import OpenAI from "openai";
 import { formatTime } from "@/utils/dateFormat";
-import { stripHtmlTags, removeWhitespaceAndNewlines } from "@/utils/textFormat";
+import { removeWhitespaceAndNewlines } from "@/utils/textFormat";
+import { JSDOM } from "jsdom";
 
 interface CustomResponse extends NextApiResponse {
   flush?: () => void;
+}
+
+function stripHtmlTags(html: string): string {
+  const dom = new JSDOM(html);
+  return dom.window.document.body.textContent || "";
 }
 
 export default async function handler(
