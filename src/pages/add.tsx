@@ -113,7 +113,7 @@ function AddPage() {
     if (bookUrl) {
       console.log("url被更新", bookUrl);
       const fetchBookInfo = async () => {
-        const res = await fetch(`/api/fetchBookInfo?url=${bookUrl}`);
+        const res = await fetch(`/api/bookInfo?url=${bookUrl}`);
         const book: BookProps = await res.json();
         if (book) {
           console.log("请求成功", book);
