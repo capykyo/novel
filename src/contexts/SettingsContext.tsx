@@ -63,7 +63,9 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({
   }, [settings]);
 
   useLayoutEffect(() => {
-    const savedSettings = JSON.parse(localStorage.getItem("settings") || "{}");
+    const savedSettings = JSON.parse(
+      localStorage.getItem("settings") || JSON.stringify(defaultSettings)
+    );
     if (savedSettings) {
       setSettings(savedSettings);
       updateThemeClasses(savedSettings.theme);

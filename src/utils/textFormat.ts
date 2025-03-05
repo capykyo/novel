@@ -1,5 +1,6 @@
 export function removeWhitespaceAndNewlines(text: string): string {
-  return text.replace(/\s+/g, ""); // 去除所有空格和换行符
+  // 判断text是有效字符
+  return text.replace ? text.replace(/\s+/g, "") : text; // 去除所有空格和换行符
 }
 export function stripHtmlTags(html: string): string {
   const parser = new DOMParser();

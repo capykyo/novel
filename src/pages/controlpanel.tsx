@@ -107,7 +107,7 @@ function ControlPanelPage() {
       );
       features[0].name = "阅读: " + bookInfo[0]?.title;
       features[0].description = bookInfo[0]?.description || "";
-      features[0].href = `/article?initialArticleNumber=${bookInfo[0]?.currentChapter}&url=${bookInfo[0]?.url}`;
+      features[0].href = `/article?number=${bookInfo[0]?.currentChapter}&url=${bookInfo[0]?.url}`;
     } else {
       features[0].name = "阅读: 暂无书籍";
       features[0].description = "请添加书籍";

@@ -25,20 +25,20 @@ export function usePagination(initialPage: number, url: string) {
   useEffect(() => {
     if (data && !isLoading) {
       // 预加载下一页
-      prefetchPage(currentPage + 1, url);
+      prefetchPage(Number(currentPage) + 1, url);
     }
   }, [currentPage, data, isLoading, url]);
 
   const handleNextPage = () => {
-    setCurrentPage((prev) => prev + 1);
+    setCurrentPage((prev) => Number(prev) + 1);
   };
 
   const handlePrevPage = () => {
     if (currentPage > 1) {
-      setCurrentPage((prev) => prev - 1);
+      setCurrentPage((prev) => Number(prev) - 1);
 
       // 如果回到了第1页，也预加载一下上一页，避免用户反复切换时需要重新加载
-      if (currentPage === 2) {
+      if (Number(currentPage) === 2) {
         prefetchPage(1, url);
       }
     }
