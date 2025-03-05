@@ -19,6 +19,7 @@ import { IconButton } from "@/components/comm";
 import { SwipeContainer } from "@/components/article";
 import { useRouter } from "next/router";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
+import { updateBookCurrentChapter } from "@/utils/localStorageHelper";
 interface ServerSideProps {
   number: number;
   url: string;
@@ -44,7 +45,6 @@ export default function AiReadingPage({
   const [content, setContent] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [wordCount, setWordCount] = useState(0);
-  const [books, setBooks] = useState<BookProps[]>([]);
   const [book, setBook] = useState<BookProps | null>({
     title: "未载入书籍",
     author: "未载入作者",
@@ -107,6 +107,7 @@ export default function AiReadingPage({
     // 更新 URL，但不重新加载页面
     const newPage = currentPage + 1;
     setCurrentPage(newPage);
+    updateBookCurrentChapter(newPage);
     router.push(
       {
         pathname: "/aireading",
@@ -125,6 +126,7 @@ export default function AiReadingPage({
     // 更新 URL，但不重新加载页面
     const newPage = currentPage - 1;
     setCurrentPage(newPage);
+    updateBookCurrentChapter(newPage);
     router.push(
       {
         pathname: "/aireading",
@@ -142,7 +144,6 @@ export default function AiReadingPage({
   useEffect(() => {
     const bookInfo = localStorage.getItem("bookInfo");
     if (bookInfo) {
-      setBooks(JSON.parse(bookInfo));
       setBook(JSON.parse(bookInfo)[0]);
     }
     const eventSource = handleStreamResponse(number, url);
