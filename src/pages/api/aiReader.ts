@@ -2,7 +2,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import OpenAI from "openai";
 import { formatTime } from "@/utils/dateFormat";
-import { stripHtmlTags, removeWhitespaceAndNewlines } from "@/utils/textFormat";
+import {
+  stripHtmlTagsAsync,
+  removeWhitespaceAndNewlines,
+} from "@/utils/textFormat";
 
 interface CustomResponse extends NextApiResponse {
   flush?: () => void;
@@ -28,7 +31,7 @@ export default async function handler(
 
     const article = await response.json();
 
-    const processedArticle = stripHtmlTags(
+    const processedArticle = await stripHtmlTagsAsync(
       removeWhitespaceAndNewlines(article.content)
     );
 

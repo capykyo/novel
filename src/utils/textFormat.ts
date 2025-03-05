@@ -3,13 +3,13 @@ export function removeWhitespaceAndNewlines(text: string): string {
   return text.replace ? text.replace(/\s+/g, "") : text; // 去除所有空格和换行符
 }
 export function stripHtmlTags(html: string): string {
-  if (typeof window !== "undefined") {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, "text/html");
-    return doc.body.textContent || ""; // 提取文本内容
-  } else {
-    const { JSDOM } = require("jsdom");
-    const dom = new JSDOM(html);
-    return dom.window.document.body.textContent || "";
-  }
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+  return doc.body.textContent || ""; // 提取文本内容
+}
+
+export async function stripHtmlTagsAsync(html: string): Promise<string> {
+  const { JSDOM } = await import("jsdom");
+  const dom = new JSDOM(html);
+  return dom.window.document.body.textContent || "";
 }
