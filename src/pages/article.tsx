@@ -20,8 +20,19 @@ interface ServerSideProps {
 
 export async function getServerSideProps(context: { query: ServerSideProps }) {
   const { number, url } = context.query;
+
+  // 验证必需参数
+  if (!number || !url) {
+    return {
+      redirect: {
+        destination: "/controlpanel",
+        permanent: false,
+      },
+    };
+  }
+
   return {
-    props: { number, url },
+    props: { number: Number(number) || 1, url: String(url) },
   };
 }
 function ArticlePage({ number, url }: ServerSideProps) {
@@ -35,7 +46,8 @@ function ArticlePage({ number, url }: ServerSideProps) {
   const [sanitizedContent, setSanitizedContent] = useState<string>("");
 
   useEffect(() => {
-    const saved = typeof window !== "undefined" ? localStorage.getItem("bookInfo") : null;
+    const saved =
+      typeof window !== "undefined" ? localStorage.getItem("bookInfo") : null;
     if (saved) {
       setBooks(JSON.parse(saved));
       setBook(JSON.parse(saved)[0]);
@@ -87,7 +99,9 @@ function ArticlePage({ number, url }: ServerSideProps) {
   };
   useEffect(() => {
     // 当页码变化时滚动到顶部
-    window.scrollTo({ top: 0, behavior: "instant" });
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "instant" });
+    }
     if (books.length > 0) {
       books[0].currentChapter = currentPage.toString();
       if (typeof window !== "undefined") {

@@ -102,11 +102,13 @@ function AddPage() {
   };
   // init
   useLayoutEffect(() => {
-    const storedBooks: BookProps[] = JSON.parse(
-      localStorage.getItem("bookInfo") || "[]"
-    );
-    if (storedBooks) {
-      booksDispatch({ type: "init", books: storedBooks });
+    if (typeof window !== "undefined") {
+      const storedBooks: BookProps[] = JSON.parse(
+        localStorage.getItem("bookInfo") || "[]"
+      );
+      if (storedBooks) {
+        booksDispatch({ type: "init", books: storedBooks });
+      }
     }
   }, []);
 
