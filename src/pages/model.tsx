@@ -26,9 +26,9 @@ export default function ModelPage() {
     const encodedPrompt = encodeURIComponent(prompt);
 
     try {
-      const data = await apiClient.post(`/fetchAiContent`, {
+      const data = (await apiClient.post(`/fetchAiContent`, {
         prompt: encodedPrompt,
-      });
+      })) as { content: string };
       if (process.env.NODE_ENV !== "production") {
         console.log(data.content);
       }
