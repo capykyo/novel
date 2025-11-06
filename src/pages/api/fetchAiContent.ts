@@ -67,14 +67,15 @@ export default async function handler(
 
     // 返回AI处理后的内容
     res.status(200).json({ content: response });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching AI content:", error);
+    const err = error as { message?: string; status?: number };
     const errorMessage =
-      error?.message?.includes("API key") ||
-      error?.status === 401 ||
-      error?.status === 403
+      err?.message?.includes("API key") ||
+      err?.status === 401 ||
+      err?.status === 403
         ? "API Key 无效或未配置，请在设置页面检查配置"
-        : error?.message?.includes("rate limit")
+        : err?.message?.includes("rate limit")
         ? "API 调用频率过高，请稍后重试"
         : "AI 处理失败，请稍后重试";
     res.status(500).json({ error: errorMessage });
