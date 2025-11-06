@@ -158,23 +158,27 @@ export default function AiReadingPage({
   };
 
   useEffect(() => {
-    const saved = storage.get<any[]>("bookInfo", []);
+    const saved = storage.get<BookProps[]>("bookInfo", []);
     if (saved && saved.length > 0) {
       setBook(saved[0]);
     }
     const eventSource = handleStreamResponse(number, url);
     return () => {
-      if (eventSource && (eventSource as any).close) {
+      if (eventSource && eventSource.readyState !== EventSource.CLOSED) {
         eventSource.close();
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [number, url]);
 
   useEffect(() => {
     const eventSource = handleStreamResponse(currentPage, url);
     return () => {
-      eventSource.close();
+      if (eventSource && eventSource.readyState !== EventSource.CLOSED) {
+        eventSource.close();
+      }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage]);
 
   return (

@@ -48,14 +48,16 @@ const TimeSaving: React.FC<TimeSavingProps> = ({
       );
 
       // 更新总时间统计
-      typeof window !== "undefined" && localStorage.setItem(
-        "totalOriginalTime",
-        (totalOriginalTime + originalTime).toString()
-      );
-      typeof window !== "undefined" && localStorage.setItem(
-        "totalSavedTime",
-        (totalSavedTime + savedTime).toString()
-      );
+      if (typeof window !== "undefined") {
+        localStorage.setItem(
+          "totalOriginalTime",
+          (totalOriginalTime + originalTime).toString()
+        );
+        localStorage.setItem(
+          "totalSavedTime",
+          (totalSavedTime + savedTime).toString()
+        );
+      }
 
       // 将当前章节添加到已阅读章节记录中
       readChapters.push(currentPage);
