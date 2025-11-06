@@ -2,7 +2,6 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, act, cleanup } from "@testing-library/react";
 import React from "react";
 import { BookProvider, useBookContext } from "@/contexts/BookContext";
-import { BookProps } from "@/types/book";
 
 const TestComponent: React.FC = () => {
   const { bookInfo, currentPage, setBookInfo, setCurrentPage } = useBookContext();

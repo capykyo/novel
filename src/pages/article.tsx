@@ -94,6 +94,7 @@ function ArticlePage({ number, url }: ServerSideProps) {
         localStorage.setItem("bookInfo", JSON.stringify(books));
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage]); // 依赖于 currentPage
   return (
     <MainLayout>

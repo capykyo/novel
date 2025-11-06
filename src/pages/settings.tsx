@@ -52,7 +52,7 @@ export default function SettingsPage() {
   };
   const apiKey = useRef<HTMLInputElement>(null);
   const aiModel = useRef<HTMLSelectElement>(null);
-  const [restTime, setRestTime] = useState<number>(15);
+  const [restTime] = useState<number>(15);
 
   useEffect(() => {
     if (apiKey.current) {

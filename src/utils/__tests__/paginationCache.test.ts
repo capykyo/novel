@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeAll, vi } from "vitest";
-import React from "react";
 import { renderHook, act } from "@testing-library/react";
 import { usePagination } from "@/utils/paginationCache";
 
