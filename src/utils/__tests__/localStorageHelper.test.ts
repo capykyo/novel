@@ -27,7 +27,7 @@ describe("localStorageHelper", () => {
 
       expect(storage.get).toHaveBeenCalledWith("bookInfo", []);
       expect(storage.set).toHaveBeenCalledWith("bookInfo", [
-        { title: "Book 1", currentChapter: 5 },
+        { title: "Book 1", currentChapter: "5" },
         { title: "Book 2", currentChapter: "2" },
       ]);
     });
@@ -57,7 +57,7 @@ describe("localStorageHelper", () => {
       updateBookCurrentChapter(10);
 
       expect(storage.set).toHaveBeenCalledWith("bookInfo", [
-        { title: "Book 1", currentChapter: 10 },
+        { title: "Book 1", currentChapter: "10" },
       ]);
     });
   });
