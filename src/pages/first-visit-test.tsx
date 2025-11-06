@@ -111,7 +111,7 @@ export default function FirstVisitTestPage() {
               <li>✅ 无控制台警告</li>
               <li>✅ 页面布局正常</li>
               <li>✅ 导航链接正常工作</li>
-              <li>✅ 空状态提示清晰（如"暂无书籍"）</li>
+              <li>✅ 空状态提示清晰（如&ldquo;暂无书籍&rdquo;）</li>
               <li>✅ 错误信息友好（如 API Key 缺失提示）</li>
               <li>✅ 重定向逻辑正确（无参数时重定向到控制台）</li>
             </ul>
