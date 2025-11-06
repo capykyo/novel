@@ -1,16 +1,10 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
-
-interface BookInfo {
-  title: string;
-  img: string;
-  description: string;
-  url: string;
-}
+import { BookProps } from "@/types/book";
 
 interface BookContextType {
-  bookInfo: BookInfo | null;
+  bookInfo: BookProps | null;
   currentPage: number;
-  setBookInfo: (info: BookInfo | null) => void;
+  setBookInfo: (info: BookProps | null) => void;
   setCurrentPage: (page: number) => void;
 }
 
@@ -19,7 +13,7 @@ const BookContext = createContext<BookContextType | undefined>(undefined);
 export const BookProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [bookInfo, setBookInfo] = useState<BookInfo | null>(null);
+  const [bookInfo, setBookInfo] = useState<BookProps | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
 
   return (

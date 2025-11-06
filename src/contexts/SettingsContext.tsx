@@ -7,6 +7,7 @@ import {
   useEffect,
   useLayoutEffect,
 } from "react";
+import { storage } from "@/utils/storage";
 
 interface Settings {
   theme: string;
@@ -59,13 +60,11 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("settings", JSON.stringify(settings));
+    storage.set("settings", settings);
   }, [settings]);
 
   useLayoutEffect(() => {
-    const savedSettings = JSON.parse(
-      localStorage.getItem("settings") || JSON.stringify(defaultSettings)
-    );
+    const savedSettings = storage.get("settings", defaultSettings);
     if (savedSettings) {
       setSettings(savedSettings);
       updateThemeClasses(savedSettings.theme);

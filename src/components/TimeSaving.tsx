@@ -31,32 +31,37 @@ const TimeSaving: React.FC<TimeSavingProps> = ({
   useEffect(() => {
     // 获取已阅读章节记录
     const readChapters = JSON.parse(
-      localStorage.getItem("readChapters") || "[]"
+      (typeof window !== "undefined" && localStorage.getItem("readChapters")) ||
+        "[]"
     );
 
     // 如果当前章节尚未被记录，则更新总时间统计
     if (!readChapters.includes(currentPage)) {
       // 获取现有的总时间统计
       const totalOriginalTime = parseInt(
-        localStorage.getItem("totalOriginalTime") || "0"
+        (typeof window !== "undefined" && localStorage.getItem("totalOriginalTime")) ||
+          "0"
       );
       const totalSavedTime = parseInt(
-        localStorage.getItem("totalSavedTime") || "0"
+        (typeof window !== "undefined" && localStorage.getItem("totalSavedTime")) ||
+          "0"
       );
 
       // 更新总时间统计
-      localStorage.setItem(
+      typeof window !== "undefined" && localStorage.setItem(
         "totalOriginalTime",
         (totalOriginalTime + originalTime).toString()
       );
-      localStorage.setItem(
+      typeof window !== "undefined" && localStorage.setItem(
         "totalSavedTime",
         (totalSavedTime + savedTime).toString()
       );
 
       // 将当前章节添加到已阅读章节记录中
       readChapters.push(currentPage);
-      localStorage.setItem("readChapters", JSON.stringify(readChapters));
+      if (typeof window !== "undefined") {
+        localStorage.setItem("readChapters", JSON.stringify(readChapters));
+      }
     }
   }, [currentPage, originalTime, savedTime]);
 
