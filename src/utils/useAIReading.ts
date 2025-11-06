@@ -11,7 +11,9 @@ const prefetchAIContent = (content: string) => {
   const body = JSON.stringify({ prompt: processedContent });
 
   preload(`/api/fetchAiContent`, async () => {
-    const result = await apiClient.post(`/fetchAiContent`, JSON.parse(body));
+    const result = (await apiClient.post(`/fetchAiContent`, JSON.parse(body))) as {
+      content: string;
+    };
     return result.content;
   });
 };
@@ -29,9 +31,9 @@ export function useAIReading(
       removeWhitespaceAndNewlines(content)
     );
 
-    const result = await apiClient.post(`/fetchAiContent`, {
+    const result = (await apiClient.post(`/fetchAiContent`, {
       prompt: processedContent,
-    });
+    })) as { content: string };
     return result.content;
   };
 
