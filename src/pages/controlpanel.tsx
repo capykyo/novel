@@ -96,7 +96,8 @@ function ControlPanelPage() {
     ];
     // 获取书籍信息
     const bookInfo: BookProps[] = JSON.parse(
-      localStorage.getItem("bookInfo") || "[]"
+      (typeof window !== "undefined" && localStorage.getItem("bookInfo")) ||
+        "[]"
     );
     if (bookInfo.length > 0) {
       features[0].background = (

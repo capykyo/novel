@@ -5,14 +5,7 @@ import { formatTime } from "@/utils/dateFormat";
 import EstimatedReadingTime from "@/components/EstimatedReadingTime";
 import ReadingTime from "@/components/ReadingDuration";
 import TimeSaving from "@/components/TimeSaving";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+import BreadcrumbNav from "@/components/comm/BreadcrumbNav";
 import { BookProps } from "@/types/book";
 import Link from "next/link";
 import { IconButton } from "@/components/comm";
@@ -20,6 +13,7 @@ import { SwipeContainer } from "@/components/article";
 import { useRouter } from "next/router";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
 import { updateBookCurrentChapter } from "@/utils/localStorageHelper";
+import { storage } from "@/utils/storage";
 interface ServerSideProps {
   number: number;
   url: string;
@@ -45,6 +39,7 @@ export default function AiReadingPage({
   const [content, setContent] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [wordCount, setWordCount] = useState(0);
+  const [error, setError] = useState<string | null>(null);
   const [book, setBook] = useState<BookProps | null>({
     title: "未载入书籍",
     author: "未载入作者",
@@ -61,6 +56,7 @@ export default function AiReadingPage({
   const handleStreamResponse = (number: number, url: string) => {
     setIsLoading(true);
     setContent("");
+    setError(null);
 
     // 创建 EventSource 实例
     const eventSource = new EventSource(
@@ -68,7 +64,9 @@ export default function AiReadingPage({
     );
 
     eventSource.onopen = () => {
-      console.log("EventSource连接建立时间:", formatTime(Date.now()));
+      if (process.env.NODE_ENV !== "production") {
+        console.log("EventSource连接建立时间:", formatTime(Date.now()));
+      }
     };
 
     // 接收开始时发送的textLength
@@ -88,9 +86,27 @@ export default function AiReadingPage({
       // console.log("content", content);
     };
 
-    // 处理错误
-    eventSource.onerror = (error) => {
-      console.error("EventSource failed:", error);
+    // 处理错误事件（来自服务端的 error 事件）
+    eventSource.addEventListener("error", (event: Event) => {
+      const messageEvent = event as MessageEvent;
+      try {
+        const errorData = JSON.parse(messageEvent.data);
+        setError(errorData.error || "AI 处理失败，请稍后重试");
+      } catch {
+        // 如果不是 JSON 格式，可能是连接错误
+        setError("AI 处理失败，请稍后重试");
+      }
+      eventSource.close();
+      setIsLoading(false);
+    });
+
+    // 处理连接错误
+    eventSource.onerror = () => {
+      // onerror 会在连接失败时触发，此时可能还没有收到 error 事件
+      // 如果已经有错误信息就不覆盖
+      if (!error) {
+        setError("连接失败，请检查网络或 API 配置");
+      }
       eventSource.close();
       setIsLoading(false);
     };
@@ -142,15 +158,17 @@ export default function AiReadingPage({
   };
 
   useEffect(() => {
-    const bookInfo = localStorage.getItem("bookInfo");
-    if (bookInfo) {
-      setBook(JSON.parse(bookInfo)[0]);
+    const saved = storage.get<any[]>("bookInfo", []);
+    if (saved && saved.length > 0) {
+      setBook(saved[0]);
     }
     const eventSource = handleStreamResponse(number, url);
     return () => {
-      eventSource.close();
+      if (eventSource && (eventSource as any).close) {
+        eventSource.close();
+      }
     };
-  }, []);
+  }, [number, url]);
 
   useEffect(() => {
     const eventSource = handleStreamResponse(currentPage, url);
@@ -173,21 +191,13 @@ export default function AiReadingPage({
           currentPage={currentPage}
         />
       </div>
-      <Breadcrumb className="self-start mb-4">
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/">Home</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/controlpanel">控制台</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>{book?.title}</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+      <BreadcrumbNav
+        items={[
+          { label: "Home", href: "/" },
+          { label: "控制台", href: "/controlpanel" },
+          { label: book?.title || "AI 阅读", isPage: true },
+        ]}
+      />
 
       <Link
         href={{
@@ -213,9 +223,22 @@ export default function AiReadingPage({
         onSwipeRight={handleSwipeRight}
       >
         <div className="mt-4 whitespace-pre-wrap border p-4 rounded min-h-[200px] relative">
-          <MarkdownRenderer content={content} />
-          {isLoading && (
-            <span className="inline-block ml-1 animate-blink">▋</span>
+          {error ? (
+            <div className="text-red-500 dark:text-red-400">
+              <p className="font-semibold mb-2">错误：{error}</p>
+              <Link href="/settings">
+                <button className="text-blue-500 hover:underline">
+                  前往设置页面配置 API Key
+                </button>
+              </Link>
+            </div>
+          ) : (
+            <>
+              <MarkdownRenderer content={content} />
+              {isLoading && (
+                <span className="inline-block ml-1 animate-blink">▋</span>
+              )}
+            </>
           )}
         </div>
       </SwipeContainer>

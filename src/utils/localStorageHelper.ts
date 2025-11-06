@@ -1,9 +1,10 @@
+import { storage } from "@/utils/storage";
+
 // 更新BookInfo第一本书的currentChapter
 export const updateBookCurrentChapter = (currentChapter: number) => {
-  const bookInfo = localStorage.getItem("bookInfo");
-  if (bookInfo) {
-    const bookInfoObj = JSON.parse(bookInfo);
+  const bookInfoObj = storage.get<any[]>("bookInfo", []);
+  if (bookInfoObj && bookInfoObj.length > 0) {
     bookInfoObj[0].currentChapter = currentChapter;
-    localStorage.setItem("bookInfo", JSON.stringify(bookInfoObj));
+    storage.set("bookInfo", bookInfoObj);
   }
 };
