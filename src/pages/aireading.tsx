@@ -22,11 +22,22 @@ interface ServerSideProps {
 
 export async function getServerSideProps(context: { query: ServerSideProps }) {
   const { number, url, originalWordCount } = context.query;
+
+  // 验证必需参数
+  if (!number || !url) {
+    return {
+      redirect: {
+        destination: "/controlpanel",
+        permanent: false,
+      },
+    };
+  }
+
   return {
     props: {
-      number,
-      url,
-      originalWordCount,
+      number: Number(number) || 1,
+      url: String(url),
+      originalWordCount: Number(originalWordCount) || 0,
     },
   };
 }
