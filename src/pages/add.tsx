@@ -83,7 +83,9 @@ function AddPage() {
       setBookUrl(currentBookUrl);
       setPrevBookUrl(currentBookUrl); // 更新上一个bookUrl
 
-      console.log("handleSubmit被执行", currentBookUrl);
+      if (process.env.NODE_ENV !== "production") {
+        console.log("handleSubmit被执行", currentBookUrl);
+      }
       toast({
         title: "添加成功",
         description: "文章链接：" + currentBookUrl,
@@ -111,12 +113,16 @@ function AddPage() {
   // 当input输入框输入内容时，调用
   useEffect(() => {
     if (bookUrl) {
-      console.log("url被更新", bookUrl);
+      if (process.env.NODE_ENV !== "production") {
+        console.log("url被更新", bookUrl);
+      }
       const fetchBookInfo = async () => {
         const res = await fetch(`/api/bookInfo?url=${bookUrl}`);
         const book: BookProps = await res.json();
         if (book) {
-          console.log("请求成功", book);
+          if (process.env.NODE_ENV !== "production") {
+            console.log("请求成功", book);
+          }
           booksDispatch({ type: "update", book });
         }
       };

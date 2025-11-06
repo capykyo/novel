@@ -1,14 +1,7 @@
 import MainLayout from "@/layouts/MainLayout";
 import EstimatedReadingTime from "@/components/EstimatedReadingTime";
 import ReadingTime from "@/components/ReadingDuration";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+import BreadcrumbNav from "@/components/comm/BreadcrumbNav";
 import { ScrollProgress } from "@/components/magicui/scroll-progress";
 import { BookProps } from "@/types/book";
 import { useState, useEffect } from "react";
@@ -39,12 +32,13 @@ function ArticlePage({ number, url }: ServerSideProps) {
     usePagination(number, url);
   const { textSize } = useSettings();
   const [cleanedContent, setCleanContent] = useState<string>("");
+  const [sanitizedContent, setSanitizedContent] = useState<string>("");
 
   useEffect(() => {
-    const bookInfo = localStorage.getItem("bookInfo");
-    if (bookInfo) {
-      setBooks(JSON.parse(bookInfo));
-      setBook(JSON.parse(bookInfo)[0]);
+    const saved = typeof window !== "undefined" ? localStorage.getItem("bookInfo") : null;
+    if (saved) {
+      setBooks(JSON.parse(saved));
+      setBook(JSON.parse(saved)[0]);
     }
   }, []);
   useEffect(() => {
@@ -52,6 +46,17 @@ function ArticlePage({ number, url }: ServerSideProps) {
       setCleanContent(cleanHtmlContent(content));
     }
   }, [content]);
+
+  // 只在客户端动态导入并清理 HTML
+  useEffect(() => {
+    if (typeof window !== "undefined" && cleanedContent) {
+      import("isomorphic-dompurify").then((DOMPurify) => {
+        setSanitizedContent(DOMPurify.default.sanitize(cleanedContent));
+      });
+    } else {
+      setSanitizedContent(cleanedContent);
+    }
+  }, [cleanedContent]);
 
   const handleSwipeLeft = () => {
     // 更新 URL，但不重新加载页面
@@ -84,9 +89,10 @@ function ArticlePage({ number, url }: ServerSideProps) {
     // 当页码变化时滚动到顶部
     window.scrollTo({ top: 0, behavior: "instant" });
     if (books.length > 0) {
-      // 更新第一本书的页码
       books[0].currentChapter = currentPage.toString();
-      localStorage.setItem("bookInfo", JSON.stringify(books));
+      if (typeof window !== "undefined") {
+        localStorage.setItem("bookInfo", JSON.stringify(books));
+      }
     }
   }, [currentPage]); // 依赖于 currentPage
   return (
@@ -95,21 +101,13 @@ function ArticlePage({ number, url }: ServerSideProps) {
         <EstimatedReadingTime wordCount={content.length} />
         <ReadingTime />
       </div>
-      <Breadcrumb className="self-start mb-4">
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/">Home</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/controlpanel">控制台</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>{book?.title}</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+      <BreadcrumbNav
+        items={[
+          { label: "Home", href: "/" },
+          { label: "控制台", href: "/controlpanel" },
+          { label: book?.title || "文章", isPage: true },
+        ]}
+      />
       <SwipeContainer
         onSwipeLeft={handleSwipeLeft}
         onSwipeRight={handleSwipeRight}
@@ -142,7 +140,7 @@ function ArticlePage({ number, url }: ServerSideProps) {
           <div
             className="grow"
             style={{ fontSize: `${textSize}px` }}
-            dangerouslySetInnerHTML={{ __html: cleanedContent }}
+            dangerouslySetInnerHTML={{ __html: sanitizedContent }}
           />
         )}
       </SwipeContainer>
