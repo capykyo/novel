@@ -59,9 +59,18 @@ const GlobalSettingsButton: React.FC = () => {
               <p>设置菜单</p>
             </TooltipContent>
           </Tooltip>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem onClick={() => toggleTheme()}>
-              {theme === "day" ? (
+          <DropdownMenuContent
+            align="end"
+            className="w-48"
+            onCloseAutoFocus={(e) => e.preventDefault()}
+          >
+            <DropdownMenuItem
+              onSelect={(e) => {
+                e.preventDefault();
+                toggleTheme();
+              }}
+            >
+              {theme === "light" ? (
                 <>
                   <Moon className="mr-2 h-4 w-4" />
                   切换到暗色模式
@@ -73,12 +82,20 @@ const GlobalSettingsButton: React.FC = () => {
                 </>
               )}
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setTextSize(textSize + 1)}>
+            <DropdownMenuItem
+              onSelect={(e) => {
+                e.preventDefault();
+                setTextSize(textSize + 1);
+              }}
+            >
               <Plus className="mr-2 h-4 w-4" />
               增大字体
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => setTextSize(Math.max(10, textSize - 1))}
+              onSelect={(e) => {
+                e.preventDefault();
+                setTextSize(Math.max(10, textSize - 1));
+              }}
             >
               <Minus className="mr-2 h-4 w-4" />
               减小字体
