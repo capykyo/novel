@@ -12,6 +12,13 @@ import {
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Info } from "lucide-react";
 import { NumberTicker } from "@/components/magicui/number-ticker";
 import { storage } from "@/utils/storage";
 import { useToast } from "@/hooks/use-toast";
@@ -65,7 +72,21 @@ export function RestTimeManager() {
         <CardDescription>重置休息时间，并设置您想要休息的时间</CardDescription>
       </CardHeader>
       <CardContent>
-        <Label>休息时间</Label>
+        <div className="flex items-center gap-2">
+          <Label>休息时间</Label>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="max-w-xs">
+                  设置阅读提醒的休息间隔时间，帮助您合理安排阅读节奏。
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
         <div className="flex items-center mt-2">
           <NumberTicker
             value={restTime}

@@ -13,6 +13,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Info } from "lucide-react";
 import { storage } from "@/utils/storage";
 import { useToast } from "@/hooks/use-toast";
 
@@ -84,7 +91,21 @@ export function ApiKeyManager() {
         <CardDescription>输入您的API KEY</CardDescription>
       </CardHeader>
       <CardContent>
-        <Label>API KEY</Label>
+        <div className="flex items-center gap-2">
+          <Label>API KEY</Label>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="max-w-xs">
+                  请输入您的 OpenAI API Key。此密钥仅存储在本地浏览器中，不会上传到服务器。
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
         <Input
           ref={inputRef}
           type="text"
