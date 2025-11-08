@@ -12,6 +12,13 @@ import {
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Info } from "lucide-react";
 import { SelectScrollable, SelectScrollableProps } from "./SelectScrollable";
 import { storage } from "@/utils/storage";
 import { useToast } from "@/hooks/use-toast";
@@ -93,7 +100,21 @@ export function ModelManager() {
         <CardDescription>选择您想要使用的 AI 模型</CardDescription>
       </CardHeader>
       <CardContent>
-        <Label>AI 模型</Label>
+        <div className="flex items-center gap-2">
+          <Label>AI 模型</Label>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="max-w-xs">
+                  选择用于 AI 阅读的模型。免费模型有使用限制，付费模型按 token 计费。
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
         <SelectScrollable
           trigger="选择 AI 模型"
           groups={modelGroups}

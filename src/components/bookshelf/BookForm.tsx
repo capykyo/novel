@@ -12,6 +12,13 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Info } from "lucide-react";
 import { BorderBeam } from "@/components/magicui/border-beam";
 import { useToast } from "@/hooks/use-toast";
 import { throttle } from "@/utils/helper";
@@ -67,7 +74,21 @@ export function BookForm({ onBookAdd }: BookFormProps) {
         <CardContent>
           <div className="grid w-full items-center gap-4">
             <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="bookUrl">书籍链接</Label>
+              <div className="flex items-center gap-2">
+                <Label htmlFor="bookUrl">书籍链接</Label>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs">
+                        请输入支持的小说网站链接，例如：https://quanben.io/n/xxx/
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
               <Input
                 id="bookUrl"
                 name="bookUrl"
