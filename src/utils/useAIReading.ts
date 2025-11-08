@@ -11,13 +11,9 @@ const prefetchAIContent = (content: string) => {
   const body = JSON.stringify({ prompt: processedContent });
 
   preload(`/api/fetchAiContent`, async () => {
-<<<<<<< HEAD
     const result = (await apiClient.post(`/fetchAiContent`, JSON.parse(body))) as {
       content: string;
     };
-=======
-    const result = await apiClient.post(`/fetchAiContent`, JSON.parse(body));
->>>>>>> 186f60b (refactor: enhance localStorage handling and improve error management across components)
     return result.content;
   });
 };
@@ -35,15 +31,9 @@ export function useAIReading(
       removeWhitespaceAndNewlines(content)
     );
 
-<<<<<<< HEAD
     const result = (await apiClient.post(`/fetchAiContent`, {
       prompt: processedContent,
     })) as { content: string };
-=======
-    const result = await apiClient.post(`/fetchAiContent`, {
-      prompt: processedContent,
-    });
->>>>>>> 186f60b (refactor: enhance localStorage handling and improve error management across components)
     return result.content;
   };
 
