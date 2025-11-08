@@ -12,6 +12,7 @@ import { IconButton } from "@/components/comm";
 import { SwipeContainer } from "@/components/article";
 import { useRouter } from "next/router";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
+import { Button } from "@/components/ui/button";
 import { updateBookCurrentChapter } from "@/utils/localStorageHelper";
 import { storage } from "@/utils/storage";
 interface ServerSideProps {
@@ -242,9 +243,12 @@ export default function AiReadingPage({
             <div className="text-red-500 dark:text-red-400">
               <p className="font-semibold mb-2">错误：{error}</p>
               <Link href="/settings">
-                <button className="text-blue-500 hover:underline">
+                <Button
+                  variant="link"
+                  className="text-blue-500 hover:underline"
+                >
                   前往设置页面配置 API Key
-                </button>
+                </Button>
               </Link>
             </div>
           ) : (
