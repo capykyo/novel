@@ -1,11 +1,12 @@
-// 在服务端执行，所以不需要配置apiKey和baseURL
 import { OpenAI } from "openai";
 
 class Client extends OpenAI {
   private static instance: Client;
 
   private constructor() {
-    super();
+    super({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
   }
 
   public static getInstance(): Client {

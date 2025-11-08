@@ -1,6 +1,7 @@
 import useSWR, { preload } from "swr";
 import { useEffect } from "react";
 import { removeWhitespaceAndNewlines, stripHtmlTags } from "@/utils/textFormat";
+import apiClient from "@/lib/apiClient";
 
 // 预加载函数
 const prefetchAIContent = (content: string) => {
@@ -10,19 +11,9 @@ const prefetchAIContent = (content: string) => {
   const body = JSON.stringify({ prompt: processedContent });
 
   preload(`/api/fetchAiContent`, async () => {
-    const response = await fetch(`/api/fetchAiContent`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body,
-    });
-
-    if (!response.ok) {
-      throw new Error("网络响应不正常");
-    }
-
-    const result = await response.json();
+    const result = (await apiClient.post(`/fetchAiContent`, JSON.parse(body))) as {
+      content: string;
+    };
     return result.content;
   });
 };
@@ -40,21 +31,9 @@ export function useAIReading(
       removeWhitespaceAndNewlines(content)
     );
 
-    const response = await fetch(`/api/fetchAiContent`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        prompt: processedContent,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error("网络响应不正常");
-    }
-
-    const result = await response.json();
+    const result = (await apiClient.post(`/fetchAiContent`, {
+      prompt: processedContent,
+    })) as { content: string };
     return result.content;
   };
 

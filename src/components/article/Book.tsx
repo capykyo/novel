@@ -4,18 +4,16 @@ import Image from "next/image";
 import { BookProps } from "@/types/book";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { storage } from "@/utils/storage";
 
 function Book({ book }: { book: BookProps }) {
   // 处理继续阅读的逻辑，当开始继续阅读时，需要将该本书插入到localStorage bookInfo中的第一项，并删除该本书
   const handleContinueReading = () => {
-    const bookInfo = localStorage.getItem("bookInfo");
-    if (bookInfo) {
-      const bookInfoArray = JSON.parse(bookInfo);
-      const newArr = bookInfoArray.filter(
-        (item: BookProps) => item.url !== book.url
-      );
+    const bookInfoArray = storage.get<BookProps[]>("bookInfo", []);
+    if (bookInfoArray) {
+      const newArr = bookInfoArray.filter((item) => item.url !== book.url);
       newArr.unshift(book);
-      localStorage.setItem("bookInfo", JSON.stringify(newArr));
+      storage.set("bookInfo", newArr);
     }
   };
   return (

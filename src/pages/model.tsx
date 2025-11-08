@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
 import EstimatedReadingTime from "@/components/EstimatedReadingTime";
 import { removeWhitespaceAndNewlines, stripHtmlTags } from "@/utils/textFormat";
+import apiClient from "@/lib/apiClient";
 export default function ModelPage() {
   const [response, setResponse] = useState<string>("");
   const { content, handleNextPage, handlePrevPage } = usePagination(
@@ -18,25 +19,19 @@ export default function ModelPage() {
     const originalLength = content.length;
     const cleanedLength = cleanedContent.length;
     const reducedLength = originalLength - cleanedLength;
-    console.log(`缩减了 ${reducedLength} 字符`);
+    if (process.env.NODE_ENV !== "production") {
+      console.log(`缩减了 ${reducedLength} 字符`);
+    }
     const prompt = `[${cleanedContent}]`;
     const encodedPrompt = encodeURIComponent(prompt);
 
     try {
-      const response = await fetch(`/api/fetchAiContent`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ prompt: encodedPrompt }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      const data = (await apiClient.post(`/fetchAiContent`, {
+        prompt: encodedPrompt,
+      })) as { content: string };
+      if (process.env.NODE_ENV !== "production") {
+        console.log(data.content);
       }
-
-      const data = await response.json();
-      console.log(data.content);
       setResponse(data.content);
     } catch (error) {
       console.error("Fetch error:", error);
@@ -44,7 +39,9 @@ export default function ModelPage() {
     }
   };
   useEffect(() => {
-    console.log("content内容", content);
+    if (process.env.NODE_ENV !== "production") {
+      console.log("content内容", content);
+    }
     if (content) {
       fetchResponse(content);
     }

@@ -19,6 +19,22 @@ export default async function handler(
   res: CustomResponse
 ) {
   const { number, url } = req.query;
+  
+  // 检查 API Key
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.write(
+      `event: error\ndata: ${JSON.stringify({
+        error: "API Key 未配置，请在设置页面配置 API Key",
+      })}\n\n`
+    );
+    res.end();
+    return;
+  }
+
   try {
     // 在服务端发起请求，因为没有当前页这个概念，所以不能使用相对路径来发起请求
     const host = req.headers.host || "localhost:3000";
@@ -29,7 +45,16 @@ export default async function handler(
 
     if (!response.ok) {
       console.error("Fetch error:", response.status, response.statusText);
-      return res.status(response.status).json({ error: "Fetch failed" });
+      res.setHeader("Content-Type", "text/event-stream");
+      res.setHeader("Cache-Control", "no-cache");
+      res.setHeader("Connection", "keep-alive");
+      res.write(
+        `event: error\ndata: ${JSON.stringify({
+          error: "获取文章内容失败",
+        })}\n\n`
+      );
+      res.end();
+      return;
     }
 
     const article = await response.json();
@@ -39,7 +64,9 @@ export default async function handler(
     );
 
     // GET 请求用于建立 EventSource 连接
-    const openai = new OpenAI();
+    const openai = new OpenAI({
+      apiKey: apiKey,
+    });
     // 设置 SSE 头部
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
@@ -47,10 +74,14 @@ export default async function handler(
     res.setHeader("X-Accel-Buffering", "no");
 
     const startTime = Date.now();
-    console.log("请求开始时间:", formatTime(startTime));
+    if (process.env.NODE_ENV !== "production") {
+      console.log("请求开始时间:", formatTime(startTime));
+    }
 
     try {
-      console.log("开始调用 OpenAI API:", formatTime(Date.now()));
+      if (process.env.NODE_ENV !== "production") {
+        console.log("开始调用 OpenAI API:", formatTime(Date.now()));
+      }
       const stream = await openai.beta.chat.completions.stream({
         model: "internlm/internlm2_5-7b-chat",
         temperature: 0.5,
@@ -85,7 +116,9 @@ export default async function handler(
           { role: "user", content: processedArticle || "请提供文章内容" }, // 使用存储的文章内容
         ],
       });
-      console.log("OpenAI API 返回stream时间:", formatTime(Date.now()));
+      if (process.env.NODE_ENV !== "production") {
+        console.log("OpenAI API 返回stream时间:", formatTime(Date.now()));
+      }
 
       res.write(`event: start\ndata: ${processedArticle.length}\n\n`);
       // 发送数据流
@@ -101,12 +134,23 @@ export default async function handler(
       res.write(`event: done\ndata: completed\n\n`);
       res.end();
 
-      console.log("请求结束时间:", formatTime(Date.now()));
-    } catch (error) {
+      if (process.env.NODE_ENV !== "production") {
+        console.log("请求结束时间:", formatTime(Date.now()));
+      }
+    } catch (error: unknown) {
       console.error("AI Reader Error:", error);
+      const err = error as { message?: string; status?: number };
+      const errorMessage =
+        err?.message?.includes("API key") ||
+        err?.status === 401 ||
+        err?.status === 403
+          ? "API Key 无效或未配置，请在设置页面检查配置"
+          : err?.message?.includes("rate limit")
+          ? "API 调用频率过高，请稍后重试"
+          : "AI 处理失败，请稍后重试";
       res.write(
         `event: error\ndata: ${JSON.stringify({
-          error: "Failed to read article",
+          error: errorMessage,
         })}\n\n`
       );
       res.end();

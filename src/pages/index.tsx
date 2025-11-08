@@ -39,7 +39,7 @@ function HomePage() {
             <span>，</span>
             <span className="underline underline-offset-4">轻易部署</span>
             <span>，</span>
-            <span className="">通过大模型API实现</span>
+            <span className="">信息本地化，只需要一个API KEY即可搞定</span>
           </p>
         </div>
         <div className="">

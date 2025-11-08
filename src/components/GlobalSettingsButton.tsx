@@ -1,83 +1,92 @@
-import { useState, useEffect, useRef } from "react";
 import { useSettings } from "../contexts/SettingsContext";
-import { Icon } from "@iconify-icon/react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
+import { Sun, Moon, Plus, Minus, ArrowUp, Grid3x3 } from "lucide-react";
 
 const GlobalSettingsButton: React.FC = () => {
   const { theme, toggleTheme, textSize, setTextSize } = useSettings();
-  const [isOpen, setIsOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  // 关闭菜单函数
-  const closeMenu = () => setIsOpen(false);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // 监听点击事件以关闭菜单
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        closeMenu();
-      }
-    };
-
-    // const handleEscapeKey = (event: KeyboardEvent) => {
-    //   if (event.key === "Escape") {
-    //     closeMenu();
-    //   }
-    // };
-
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-      //   document.addEventListener("keydown", handleEscapeKey);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      //   document.removeEventListener("keydown", handleEscapeKey);
-    };
-  }, [isOpen]);
-
   return (
-    <div className="fixed bottom-20 right-4" ref={menuRef}>
-      {/* Back to Top Button */}
-      <div
-        onClick={scrollToTop}
-        className="text-gray-800 w-8 h-8 bg-white rounded shadow-md opacity-30 hover:opacity-100 transition-opacity duration-300 mb-2"
-      >
-        <Icon icon="ic:baseline-arrow-circle-up" width="32" height="32" />
-      </div>
-      {/* Toggle Button */}
-      <div
-        onClick={() => setIsOpen(!isOpen)}
-        className="cursor-pointer text-gray-700 w-8 h-8 bg-white rounded shadow-md opacity-30 hover:opacity-100 transition-opacity duration-300"
-      >
-        <Icon icon="ic:baseline-apps" width="32" height="32" />
-      </div>
+    <TooltipProvider>
+      <div className="fixed bottom-20 right-4 flex flex-col gap-2">
+        {/* Back to Top Button */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={scrollToTop}
+              className="w-8 h-8 opacity-30 hover:opacity-100 transition-opacity"
+            >
+              <ArrowUp className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>返回顶部</p>
+          </TooltipContent>
+        </Tooltip>
 
-      {/* Settings Menu */}
-      {isOpen && (
-        <div className="absolute right-12 bottom-0 bg-white rounded shadow-md  z-10 text-black flex gap-x-2 h-8 p-1">
-          <button onClick={() => toggleTheme()} className="">
-            {theme === "day" ? (
-              <Icon icon="ic:baseline-brightness-high" width="26" height="26" />
-            ) : (
-              <Icon icon="ic:baseline-brightness-4" width="26" height="26" />
-            )}
-          </button>
-          <button onClick={() => setTextSize(textSize + 1)} className="">
-          <Icon icon="ic:baseline-add-circle-outline" width="26" height="26" />
-          </button>
-          <button
-            onClick={() => setTextSize(Math.max(10, textSize - 1))}
-            className=""
-          >
-            <Icon icon="ic:baseline-remove-circle-outline" width="26" height="26" />
-          </button>
-        </div>
-      )}
-    </div>
+        {/* Settings Menu */}
+        <DropdownMenu>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="w-8 h-8 opacity-30 hover:opacity-100 transition-opacity"
+                >
+                  <Grid3x3 className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>设置菜单</p>
+            </TooltipContent>
+          </Tooltip>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem onClick={() => toggleTheme()}>
+              {theme === "day" ? (
+                <>
+                  <Moon className="mr-2 h-4 w-4" />
+                  切换到暗色模式
+                </>
+              ) : (
+                <>
+                  <Sun className="mr-2 h-4 w-4" />
+                  切换到亮色模式
+                </>
+              )}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTextSize(textSize + 1)}>
+              <Plus className="mr-2 h-4 w-4" />
+              增大字体
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => setTextSize(Math.max(10, textSize - 1))}
+            >
+              <Minus className="mr-2 h-4 w-4" />
+              减小字体
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </TooltipProvider>
   );
 };
 

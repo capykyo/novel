@@ -49,7 +49,7 @@ function ControlPanelPage() {
         Icon: InputIcon,
         name: "更换新书",
         description: "当前书籍已经阅读完毕",
-        href: "/add",
+        href: "/bookshelf",
         cta: "替换",
         background: (
           <Marquee
@@ -96,7 +96,8 @@ function ControlPanelPage() {
     ];
     // 获取书籍信息
     const bookInfo: BookProps[] = JSON.parse(
-      localStorage.getItem("bookInfo") || "[]"
+      (typeof window !== "undefined" && localStorage.getItem("bookInfo")) ||
+        "[]"
     );
     if (bookInfo.length > 0) {
       features[0].background = (
@@ -111,7 +112,7 @@ function ControlPanelPage() {
     } else {
       features[0].name = "阅读: 暂无书籍";
       features[0].description = "请添加书籍";
-      features[0].href = "/add";
+      features[0].href = "/bookshelf";
     }
     setFeatures(features);
   }, []);

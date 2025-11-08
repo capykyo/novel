@@ -9,9 +9,13 @@ const TimeSavingStats: React.FC = () => {
   useEffect(() => {
     // 从 localStorage 获取时间统计数据
     const originalTime = parseInt(
-      localStorage.getItem("totalOriginalTime") || "0"
+      (typeof window !== "undefined" && localStorage.getItem("totalOriginalTime")) ||
+        "0"
     );
-    const savedTime = parseInt(localStorage.getItem("totalSavedTime") || "0");
+    const savedTime = parseInt(
+      (typeof window !== "undefined" && localStorage.getItem("totalSavedTime")) ||
+        "0"
+    );
 
     setTotalOriginalTime(originalTime);
     setTotalSavedTime(savedTime);
@@ -24,10 +28,12 @@ const TimeSavingStats: React.FC = () => {
     // 监听 localStorage 变化
     const handleStorageChange = () => {
       const updatedOriginalTime = parseInt(
-        localStorage.getItem("totalOriginalTime") || "0"
+        (typeof window !== "undefined" && localStorage.getItem("totalOriginalTime")) ||
+          "0"
       );
       const updatedSavedTime = parseInt(
-        localStorage.getItem("totalSavedTime") || "0"
+        (typeof window !== "undefined" && localStorage.getItem("totalSavedTime")) ||
+          "0"
       );
 
       setTotalOriginalTime(updatedOriginalTime);

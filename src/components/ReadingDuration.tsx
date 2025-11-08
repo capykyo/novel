@@ -11,7 +11,7 @@ const ReadingTimer: React.FC = () => {
 
   useEffect(() => {
     // 从 localStorage 恢复计时
-    const savedTime = localStorage.getItem("readingTime");
+    const savedTime = typeof window !== "undefined" && localStorage.getItem("readingTime");
     if (savedTime) {
       setTimeSpent(parseInt(savedTime, 10));
     }
@@ -38,7 +38,9 @@ const ReadingTimer: React.FC = () => {
       interval = setInterval(() => {
         setTimeSpent((prevTime) => {
           const newTime = prevTime + 1;
-          localStorage.setItem("readingTime", newTime.toString());
+          if (typeof window !== "undefined") {
+            localStorage.setItem("readingTime", newTime.toString());
+          }
           return newTime;
         });
       }, 1000);
