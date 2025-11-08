@@ -17,11 +17,18 @@ export type SelectScrollableProps = {
       value: string;
     }[];
   }[];
+  value?: string;
+  onValueChange?: (value: string) => void;
 };
 
-export function SelectScrollable({ trigger, groups }: SelectScrollableProps) {
+export function SelectScrollable({
+  trigger,
+  groups,
+  value,
+  onValueChange,
+}: SelectScrollableProps) {
   return (
-    <Select>
+    <Select value={value} onValueChange={onValueChange}>
       <SelectTrigger>
         <SelectValue placeholder={trigger} />
       </SelectTrigger>
