@@ -6,7 +6,7 @@ import {
   waitFor,
   cleanup,
 } from "@testing-library/react";
-import BookshelfPage from "../bookshelf";
+import BookshelfPage from "@/pages/bookshelf";
 import { storage } from "@/utils/storage";
 import { useToast } from "@/hooks/use-toast";
 
