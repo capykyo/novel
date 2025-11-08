@@ -2,7 +2,13 @@ import { useEffect } from "react";
 import { useRouter } from "next/router";
 import MainLayout from "@/layouts/MainLayout";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export default function FirstVisitTestPage() {
   const router = useRouter();
@@ -22,7 +28,7 @@ export default function FirstVisitTestPage() {
   const testPages = [
     { name: "首页", path: "/" },
     { name: "控制台", path: "/controlpanel" },
-    { name: "添加书籍", path: "/add" },
+    { name: "书柜管理", path: "/bookshelf" },
     { name: "设置", path: "/settings" },
     { name: "文章（无参数 - 应重定向）", path: "/article" },
     { name: "AI 阅读（无参数 - 应重定向）", path: "/aireading" },
@@ -41,12 +47,12 @@ export default function FirstVisitTestPage() {
       const bookInfo = localStorage.getItem("bookInfo");
       const apiKey = localStorage.getItem("apiKey");
       const settings = localStorage.getItem("settings");
-      
+
       alert(
         `当前存储状态:\n` +
-        `- bookInfo: ${bookInfo ? "有数据" : "空"}\n` +
-        `- apiKey: ${apiKey ? "已设置" : "未设置"}\n` +
-        `- settings: ${settings ? "有数据" : "空"}`
+          `- bookInfo: ${bookInfo ? "有数据" : "空"}\n` +
+          `- apiKey: ${apiKey ? "已设置" : "未设置"}\n` +
+          `- settings: ${settings ? "有数据" : "空"}`
       );
     }
   };
@@ -121,4 +127,3 @@ export default function FirstVisitTestPage() {
     </MainLayout>
   );
 }
-
