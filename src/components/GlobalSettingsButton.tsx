@@ -5,6 +5,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { Sun, Moon, Plus, Minus, ArrowUp, Grid3x3 } from "lucide-react";
 
@@ -16,55 +22,71 @@ const GlobalSettingsButton: React.FC = () => {
   };
 
   return (
-    <div className="fixed bottom-20 right-4 flex flex-col gap-2">
-      {/* Back to Top Button */}
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={scrollToTop}
-        className="w-8 h-8 opacity-30 hover:opacity-100 transition-opacity"
-      >
-        <ArrowUp className="h-4 w-4" />
-      </Button>
+    <TooltipProvider>
+      <div className="fixed bottom-20 right-4 flex flex-col gap-2">
+        {/* Back to Top Button */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={scrollToTop}
+              className="w-8 h-8 opacity-30 hover:opacity-100 transition-opacity"
+            >
+              <ArrowUp className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>返回顶部</p>
+          </TooltipContent>
+        </Tooltip>
 
-      {/* Settings Menu */}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="outline"
-            size="icon"
-            className="w-8 h-8 opacity-30 hover:opacity-100 transition-opacity"
-          >
-            <Grid3x3 className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48">
-          <DropdownMenuItem onClick={() => toggleTheme()}>
-            {theme === "day" ? (
-              <>
-                <Moon className="mr-2 h-4 w-4" />
-                切换到暗色模式
-              </>
-            ) : (
-              <>
-                <Sun className="mr-2 h-4 w-4" />
-                切换到亮色模式
-              </>
-            )}
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setTextSize(textSize + 1)}>
-            <Plus className="mr-2 h-4 w-4" />
-            增大字体
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => setTextSize(Math.max(10, textSize - 1))}
-          >
-            <Minus className="mr-2 h-4 w-4" />
-            减小字体
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+        {/* Settings Menu */}
+        <DropdownMenu>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="w-8 h-8 opacity-30 hover:opacity-100 transition-opacity"
+                >
+                  <Grid3x3 className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>设置菜单</p>
+            </TooltipContent>
+          </Tooltip>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem onClick={() => toggleTheme()}>
+              {theme === "day" ? (
+                <>
+                  <Moon className="mr-2 h-4 w-4" />
+                  切换到暗色模式
+                </>
+              ) : (
+                <>
+                  <Sun className="mr-2 h-4 w-4" />
+                  切换到亮色模式
+                </>
+              )}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTextSize(textSize + 1)}>
+              <Plus className="mr-2 h-4 w-4" />
+              增大字体
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => setTextSize(Math.max(10, textSize - 1))}
+            >
+              <Minus className="mr-2 h-4 w-4" />
+              减小字体
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </TooltipProvider>
   );
 };
 
