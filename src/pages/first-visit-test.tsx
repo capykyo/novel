@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useRouter } from "next/router";
+import { GetServerSideProps } from "next";
 import MainLayout from "@/layouts/MainLayout";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,6 +10,22 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  // 只在开发环境允许访问
+  if (process.env.NODE_ENV === "production") {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {},
+  };
+};
 
 export default function FirstVisitTestPage() {
   const router = useRouter();
