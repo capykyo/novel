@@ -13,6 +13,14 @@ const prefetchPage = (pageNumber: number, url: string) => {
 export function usePagination(initialPage: number, url: string) {
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
 
+  // 当 initialPage 变化时（例如从 URL 参数变化），更新 currentPage
+  useEffect(() => {
+    if (initialPage !== currentPage) {
+      setCurrentPage(initialPage);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialPage]);
+
   // 使用SWR来获取文章数据
   const { data, error } = useSWR(
     `/api/fetchArticle?number=${currentPage}&url=${url}`,
