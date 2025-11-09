@@ -5,7 +5,10 @@ import axios from "axios"; // Import axiosq
 import { bookInfo } from "./res";
 
 type AxiosMock = {
-  mockResolvedValue: (value: { data: typeof bookInfo.resHtml }) => void;
+  mockResolvedValue: (value: {
+    data: typeof bookInfo.resHtml;
+    status?: number;
+  }) => void;
 };
 
 // Mock axios
