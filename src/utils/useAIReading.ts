@@ -2,16 +2,17 @@ import useSWR, { preload } from "swr";
 import { useEffect } from "react";
 import { removeWhitespaceAndNewlines, stripHtmlTags } from "@/utils/textFormat";
 import apiClient from "@/lib/apiClient";
+import { storage } from "@/utils/storage";
 
 // 预加载函数
-const prefetchAIContent = (content: string) => {
+const prefetchAIContent = (content: string, apiKey?: string) => {
   if (!content) return;
 
   const processedContent = stripHtmlTags(removeWhitespaceAndNewlines(content));
-  const body = JSON.stringify({ prompt: processedContent });
+  const body = { prompt: processedContent, apiKey };
 
   preload(`/api/fetchAiContent`, async () => {
-    const result = (await apiClient.post(`/fetchAiContent`, JSON.parse(body))) as {
+    const result = (await apiClient.post(`/fetchAiContent`, body)) as {
       content: string;
     };
     return result.content;
@@ -31,8 +32,12 @@ export function useAIReading(
       removeWhitespaceAndNewlines(content)
     );
 
+    // 从 localStorage 获取 API Key
+    const apiKey = storage.get<string>("apiKey", "");
+
     const result = (await apiClient.post(`/fetchAiContent`, {
       prompt: processedContent,
+      apiKey,
     })) as { content: string };
     return result.content;
   };
@@ -51,7 +56,8 @@ export function useAIReading(
   // 如果提供了下一页内容，且当前页已加载完成，则预加载下一页的AI内容
   useEffect(() => {
     if (isAIReading && nextPageContent && data) {
-      prefetchAIContent(nextPageContent);
+      const apiKey = storage.get<string>("apiKey", "");
+      prefetchAIContent(nextPageContent, apiKey);
     }
   }, [isAIReading, nextPageContent, data]);
 
