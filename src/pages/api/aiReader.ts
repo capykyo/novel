@@ -18,7 +18,24 @@ export default async function handler(
   req: NextApiRequest,
   res: CustomResponse
 ) {
-  const { number, url, apiKey: clientApiKey } = req.query;
+  const { number, url: urlParam, apiKey: clientApiKey } = req.query;
+  
+  // 确保 url 是字符串类型
+  const url = typeof urlParam === "string" ? urlParam : Array.isArray(urlParam) ? urlParam[0] : "";
+  
+  // 验证必需参数
+  if (!url || !number) {
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.write(
+      `event: error\ndata: ${JSON.stringify({
+        error: "缺少必需参数：url 或 number",
+      })}\n\n`
+    );
+    res.end();
+    return;
+  }
   
   // 获取 API Key：生产环境必须使用客户端提供的，开发环境优先使用客户端的，否则使用环境变量
   const isProduction = process.env.NODE_ENV === "production";
@@ -60,18 +77,32 @@ export default async function handler(
     // 在服务端发起请求，因为没有当前页这个概念，所以不能使用相对路径来发起请求
     const host = req.headers.host || "localhost:3000";
     const protocol = req.headers["x-forwarded-proto"] || "http";
-    const fetchURL = `${protocol}://${host}/api/fetchArticle?number=${number}&url=${url}`;
+    // url 从查询参数获取，Next.js 会自动解码，所以需要重新编码
+    const encodedUrl = encodeURIComponent(url);
+    const chapterNumber = typeof number === "string" ? number : Array.isArray(number) ? number[0] : String(number);
+    const fetchURL = `${protocol}://${host}/api/fetchArticle?number=${chapterNumber}&url=${encodedUrl}`;
 
     const response = await fetch(fetchURL);
 
     if (!response.ok) {
       console.error("Fetch error:", response.status, response.statusText);
+      // 尝试解析错误信息
+      let errorMessage = "获取文章内容失败";
+      try {
+        const errorData = await response.json();
+        if (errorData.error) {
+          errorMessage = errorData.error;
+        }
+      } catch {
+        // 如果无法解析错误信息，使用默认消息
+      }
+      
       res.setHeader("Content-Type", "text/event-stream");
       res.setHeader("Cache-Control", "no-cache");
       res.setHeader("Connection", "keep-alive");
       res.write(
         `event: error\ndata: ${JSON.stringify({
-          error: "获取文章内容失败",
+          error: errorMessage,
         })}\n\n`
       );
       res.end();
@@ -79,6 +110,20 @@ export default async function handler(
     }
 
     const article = await response.json();
+    
+    // 检查文章内容是否存在
+    if (!article || !article.content) {
+      res.setHeader("Content-Type", "text/event-stream");
+      res.setHeader("Cache-Control", "no-cache");
+      res.setHeader("Connection", "keep-alive");
+      res.write(
+        `event: error\ndata: ${JSON.stringify({
+          error: article?.error || "文章内容为空",
+        })}\n\n`
+      );
+      res.end();
+      return;
+    }
 
     const processedArticle = stripHtmlTags(
       removeWhitespaceAndNewlines(article.content)

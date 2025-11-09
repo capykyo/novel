@@ -75,8 +75,12 @@ export default function AiReadingPage({
 
     // 创建 EventSource 实例，传递 API Key
     const eventSource = new EventSource(
-      `/api/aiReader?number=${number}&url=${encodeURIComponent(url)}${apiKey ? `&apiKey=${encodeURIComponent(apiKey)}` : ""}`
+      `/api/aiReader?number=${number}&url=${encodeURIComponent(url)}${
+        apiKey ? `&apiKey=${encodeURIComponent(apiKey)}` : ""
+      }`
     );
+
+    let hasReceivedError = false; // 标记是否已收到服务端错误事件
 
     eventSource.onopen = () => {
       if (process.env.NODE_ENV !== "production") {
@@ -103,6 +107,7 @@ export default function AiReadingPage({
 
     // 处理错误事件（来自服务端的 error 事件）
     eventSource.addEventListener("error", (event: Event) => {
+      hasReceivedError = true; // 标记已收到服务端错误
       const messageEvent = event as MessageEvent;
       try {
         const errorData = JSON.parse(messageEvent.data);
@@ -118,8 +123,8 @@ export default function AiReadingPage({
     // 处理连接错误
     eventSource.onerror = () => {
       // onerror 会在连接失败时触发，此时可能还没有收到 error 事件
-      // 如果已经有错误信息就不覆盖
-      if (!error) {
+      // 如果已经收到服务端错误事件，就不覆盖
+      if (!hasReceivedError) {
         setError("连接失败，请检查网络或 API 配置");
       }
       eventSource.close();
@@ -183,7 +188,6 @@ export default function AiReadingPage({
         eventSource.close();
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [number, url]);
 
   useEffect(() => {
@@ -193,8 +197,7 @@ export default function AiReadingPage({
         eventSource.close();
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage]);
+  }, [currentPage, url]);
 
   return (
     <MainLayout>
