@@ -43,21 +43,36 @@ export default async function handler(
     return res.status(405).json({ error: "Method Not Allowed" });
   }
 
-  const { prompt } = req.body;
+  const { prompt, apiKey: clientApiKey } = req.body;
 
   if (!prompt || typeof prompt !== "string") {
     return res.status(400).json({ error: "Invalid prompt" });
   }
 
-  // 检查 API Key
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    return res.status(400).json({
-      error: "API Key 未配置，请在设置页面配置 API Key",
-    });
+  // 获取 API Key：生产环境必须使用客户端提供的，开发环境优先使用客户端的，否则使用环境变量
+  const isProduction = process.env.NODE_ENV === "production";
+  let apiKey: string | undefined;
+
+  if (isProduction) {
+    // 生产环境：必须使用客户端提供的 API Key
+    apiKey = clientApiKey;
+    if (!apiKey) {
+      return res.status(400).json({
+        error: "API Key 未配置，请在设置页面配置 API Key",
+      });
+    }
+  } else {
+    // 开发环境：优先使用客户端提供的，否则使用环境变量
+    apiKey = clientApiKey || process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      return res.status(400).json({
+        error: "API Key 未配置，请在设置页面配置 API Key 或在环境变量中设置 OPENAI_API_KEY",
+      });
+    }
   }
 
-  const client = Client.getInstance();
+  // 创建使用指定 API Key 的客户端实例
+  const client = new Client(apiKey);
 
   try {
     const response = await client.createChatCompletion({

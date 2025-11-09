@@ -18,21 +18,42 @@ export default async function handler(
   req: NextApiRequest,
   res: CustomResponse
 ) {
-  const { number, url } = req.query;
+  const { number, url, apiKey: clientApiKey } = req.query;
   
-  // 检查 API Key
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    res.setHeader("Content-Type", "text/event-stream");
-    res.setHeader("Cache-Control", "no-cache");
-    res.setHeader("Connection", "keep-alive");
-    res.write(
-      `event: error\ndata: ${JSON.stringify({
-        error: "API Key 未配置，请在设置页面配置 API Key",
-      })}\n\n`
-    );
-    res.end();
-    return;
+  // 获取 API Key：生产环境必须使用客户端提供的，开发环境优先使用客户端的，否则使用环境变量
+  const isProduction = process.env.NODE_ENV === "production";
+  let apiKey: string | undefined;
+
+  if (isProduction) {
+    // 生产环境：必须使用客户端提供的 API Key
+    apiKey = typeof clientApiKey === "string" ? clientApiKey : undefined;
+    if (!apiKey) {
+      res.setHeader("Content-Type", "text/event-stream");
+      res.setHeader("Cache-Control", "no-cache");
+      res.setHeader("Connection", "keep-alive");
+      res.write(
+        `event: error\ndata: ${JSON.stringify({
+          error: "API Key 未配置，请在设置页面配置 API Key",
+        })}\n\n`
+      );
+      res.end();
+      return;
+    }
+  } else {
+    // 开发环境：优先使用客户端提供的，否则使用环境变量
+    apiKey = (typeof clientApiKey === "string" ? clientApiKey : undefined) || process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      res.setHeader("Content-Type", "text/event-stream");
+      res.setHeader("Cache-Control", "no-cache");
+      res.setHeader("Connection", "keep-alive");
+      res.write(
+        `event: error\ndata: ${JSON.stringify({
+          error: "API Key 未配置，请在设置页面配置 API Key 或在环境变量中设置 OPENAI_API_KEY",
+        })}\n\n`
+      );
+      res.end();
+      return;
+    }
   }
 
   try {

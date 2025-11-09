@@ -70,9 +70,12 @@ export default function AiReadingPage({
     setContent("");
     setError(null);
 
-    // 创建 EventSource 实例
+    // 从 localStorage 获取 API Key
+    const apiKey = storage.get<string>("apiKey", "");
+
+    // 创建 EventSource 实例，传递 API Key
     const eventSource = new EventSource(
-      `/api/aiReader?number=${number}&url=${url}`
+      `/api/aiReader?number=${number}&url=${encodeURIComponent(url)}${apiKey ? `&apiKey=${encodeURIComponent(apiKey)}` : ""}`
     );
 
     eventSource.onopen = () => {
