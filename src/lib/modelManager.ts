@@ -3,13 +3,18 @@ import { OpenAI } from "openai";
 class Client extends OpenAI {
   private static instance: Client;
 
-  private constructor() {
+  // 允许直接使用 new Client(apiKey) 创建实例
+  constructor(apiKey?: string) {
     super({
-      apiKey: process.env.OPENAI_API_KEY,
+      apiKey: apiKey || process.env.OPENAI_API_KEY,
     });
   }
 
-  public static getInstance(): Client {
+  public static getInstance(apiKey?: string): Client {
+    // 如果提供了 API Key，创建新实例；否则使用单例
+    if (apiKey) {
+      return new Client(apiKey);
+    }
     if (!Client.instance) {
       Client.instance = new Client();
     }
@@ -19,12 +24,12 @@ class Client extends OpenAI {
   public async createChatCompletion(
     options: OpenAI.Chat.ChatCompletionCreateParamsNonStreaming
   ): Promise<string> {
-    const response = await Client.instance.chat.completions.create(options);
+    const response = await this.chat.completions.create(options);
     return response.choices[0].message.content || "";
   }
 
   public streamChatCompletion() {
-    return Client.instance.beta.chat.completions.stream;
+    return this.beta.chat.completions.stream;
   }
 }
 

@@ -5,7 +5,10 @@ import axios from "axios"; // Import axiosq
 import { bookInfo } from "./res";
 
 type AxiosMock = {
-  mockResolvedValue: (value: { data: typeof bookInfo.resHtml }) => void;
+  mockResolvedValue: (value: {
+    data: typeof bookInfo.resHtml;
+    status?: number;
+  }) => void;
 };
 
 // Mock axios
@@ -30,6 +33,7 @@ describe("API Handler", () => {
     // Mock the Axios GET request
     (axios.get as unknown as AxiosMock).mockResolvedValue({
       data: bookInfo.resHtml, // Mocked response data
+      status: 200, // Add status to mock response
     });
 
     await handler(req, res); // Call API handler

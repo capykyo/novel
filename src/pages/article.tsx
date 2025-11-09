@@ -39,8 +39,14 @@ function ArticlePage({ number, url }: ServerSideProps) {
   const router = useRouter();
   const [books, setBooks] = useState<BookProps[]>([]);
   const [book, setBook] = useState<BookProps | null>(null);
+
+  // 监听路由查询参数变化，确保直接修改 URL 时能正确更新
+  const queryChapter = router.query.number ? Number(router.query.number) : null;
+  const currentChapter =
+    queryChapter && !isNaN(queryChapter) ? queryChapter : number;
+
   const { currentPage, content, handleNextPage, handlePrevPage, isLoading } =
-    usePagination(number, url);
+    usePagination(currentChapter, url);
   const { textSize } = useSettings();
   const [cleanedContent, setCleanContent] = useState<string>("");
   const [sanitizedContent, setSanitizedContent] = useState<string>("");
