@@ -1,7 +1,7 @@
 // pages/api/fetchArticle.ts
 import type { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
-import { JSDOM } from "jsdom";
+import { getParser, getSupportedSites, validateBookUrl } from "@/configs";
 
 type Data = {
   content?: string;
@@ -14,33 +14,50 @@ export default async function handler(
 ) {
   const { url, number } = req.query;
 
-  if (!number || typeof number !== "string") {
-    return res.status(400).json({ error: "Invalid article number" });
+  if (!number || typeof number !== "string" || !url || typeof url !== "string") {
+    return res.status(400).json({ error: "Invalid parameters" });
+  }
+
+  // 验证URL格式
+  if (!validateBookUrl(url)) {
+    return res.status(400).json({ error: "Invalid URL format" });
   }
 
   try {
-    // 使用Axios发起GET请求
-    const response = await axios.get(`${url}${number}.html`, {
-      headers: {
-        "User-Agent": "PostmanRuntime/7.43.0", // 设置合适的User-Agent
-      },
-    });
-
-    // 解析HTML文档并提取文章内容
-    const dom = new JSDOM(response.data);
-    const document = dom.window.document;
-
-    // 注意：这里的选择器需要根据实际网页结构调整
-    const articleContent = document.querySelector(".main")?.innerHTML || "";
-
-    if (!articleContent) {
-      throw new Error(
-        "Failed to find article content using the specified selector."
-      );
+    // 获取对应的解析器
+    const parser = getParser(url);
+    if (!parser) {
+      const supportedSites = getSupportedSites()
+        .map((site) => site.domain)
+        .join(", ");
+      return res.status(400).json({
+        error: `Unsupported website. Supported sites: ${supportedSites}`,
+      });
     }
 
-    // 返回文章内容
-    res.status(200).json({ content: articleContent });
+    const chapterNumber = parseInt(number, 10);
+    if (isNaN(chapterNumber)) {
+      return res.status(400).json({ error: "Invalid chapter number" });
+    }
+
+    // 构建文章URL
+    const articleUrl = parser.buildArticleUrl(url, chapterNumber);
+
+    // 发起请求
+    const config = parser.getConfig();
+    const response = await axios.get(articleUrl, {
+      headers: config.request?.headers || {},
+      timeout: config.request?.timeout || 10000,
+    });
+
+    // 使用解析器解析文章内容
+    const content = parser.parseArticle(response.data, chapterNumber);
+
+    if (!content) {
+      throw new Error("Failed to parse article content");
+    }
+
+    res.status(200).json({ content });
   } catch (error) {
     console.error("Detailed error information:", error);
     let errorMessage = "Failed to fetch or parse the article.";
