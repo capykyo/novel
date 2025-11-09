@@ -30,6 +30,7 @@ describe("API Handler", () => {
     // Mock the Axios GET request
     (axios.get as unknown as AxiosMock).mockResolvedValue({
       data: bookInfo.resHtml, // Mocked response data
+      status: 200, // Add status to mock response
     });
 
     await handler(req, res); // Call API handler

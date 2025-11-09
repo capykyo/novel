@@ -22,7 +22,7 @@ const Header: React.FC = () => {
             <Icon icon="mdi:github" width="26" height="26" />
           </a>
           <button onClick={() => toggleTheme()} className="flex items-center">
-            {theme === "day" ? (
+            {theme === "light" ? (
               <Icon icon="ic:baseline-brightness-high" width="26" height="26" />
             ) : (
               <Icon icon="ic:baseline-brightness-4" width="26" height="26" />
