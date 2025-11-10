@@ -118,7 +118,7 @@ function ArticlePage({ number, url }: ServerSideProps) {
   }, [currentPage]); // 依赖于 currentPage
   return (
     <MainLayout>
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2 mb-2">
         <EstimatedReadingTime wordCount={content.length} />
         <ReadingTime />
       </div>
