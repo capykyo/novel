@@ -11,7 +11,8 @@ const ReadingTimer: React.FC = () => {
 
   useEffect(() => {
     // 从 localStorage 恢复计时
-    const savedTime = typeof window !== "undefined" && localStorage.getItem("readingTime");
+    const savedTime =
+      typeof window !== "undefined" && localStorage.getItem("readingTime");
     if (savedTime) {
       setTimeSpent(parseInt(savedTime, 10));
     }
@@ -57,7 +58,12 @@ const ReadingTimer: React.FC = () => {
 
   return (
     <div className="text-sm text-gray-500 dark:text-gray-400">
-      <p>阅读时间: {formatDate(timeSpent)}</p>
+      <p className="whitespace-nowrap">
+        阅读时间:{" "}
+        <span className="font-mono tabular-nums min-w-[80px] inline-block">
+          {formatDate(timeSpent)}
+        </span>
+      </p>
     </div>
   );
 };
