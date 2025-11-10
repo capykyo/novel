@@ -129,32 +129,33 @@ function ArticlePage({ number, url }: ServerSideProps) {
           { label: book?.title || "文章", isPage: true },
         ]}
       />
+      <Link
+        href={{
+          pathname: "/aireading",
+          query: {
+            url: url,
+            number: currentPage,
+            originalWordCount: content.length,
+          },
+        }}
+      >
+        <IconButton
+          className="mb-2"
+          icon={{
+            name: "material-symbols:robot-2-outline",
+            width: "16",
+            height: "16",
+          }}
+          text="AI 阅读模式"
+        />
+      </Link>
       <SwipeContainer
         onSwipeLeft={handleSwipeLeft}
         onSwipeRight={handleSwipeRight}
         className="content dark:text-stone-300 min-h-[calc(100vh-100px)] flex flex-col"
+        style={{ touchAction: "pan-y" }}
       >
         <ScrollProgress />
-        <Link
-          href={{
-            pathname: "/aireading",
-            query: {
-              url: url,
-              number: currentPage,
-              originalWordCount: content.length,
-            },
-          }}
-        >
-          <IconButton
-            className="mb-2"
-            icon={{
-              name: "material-symbols:robot-2-outline",
-              width: "16",
-              height: "16",
-            }}
-            text="AI 阅读模式"
-          />
-        </Link>
         {isLoading ? (
           <Loading />
         ) : (
