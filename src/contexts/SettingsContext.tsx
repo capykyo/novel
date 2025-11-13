@@ -66,13 +66,23 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({
   useLayoutEffect(() => {
     const savedSettings = storage.get("settings", defaultSettings);
     if (savedSettings) {
-      setSettings(savedSettings);
-      updateThemeClasses(savedSettings.theme);
+      // 确保所有必需的字段都存在，使用默认值填充缺失的字段
+      setSettings({
+        theme: savedSettings.theme ?? defaultSettings.theme,
+        textSize: savedSettings.textSize ?? defaultSettings.textSize,
+      });
+      updateThemeClasses(savedSettings.theme ?? defaultSettings.theme);
     }
   }, []);
 
   return (
-    <SettingsContext.Provider value={{ ...settings, toggleTheme, setTextSize }}>
+    <SettingsContext.Provider
+      value={{
+        ...settings,
+        toggleTheme,
+        setTextSize,
+      }}
+    >
       {children}
     </SettingsContext.Provider>
   );
