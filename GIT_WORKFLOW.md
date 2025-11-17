@@ -488,6 +488,154 @@ git rebase --continue
 
 **注意：** 如果分支已经推送到远程并被他人使用，避免使用 rebase
 
+#### 策略 C：解决 Fork 仓库 PR 冲突（以远程为准）
+
+**场景：** 当从 fork 仓库（如 `ubdmf/novel`）向主仓库（如 `capykyo/novel`）提交 PR 时，如果 PR 显示 "This branch cannot be rebased due to conflicts"，需要在主仓库的本地分支上解决冲突。
+
+**问题示例：**
+
+- PR #32：从 `ubdmf:dev` 合并到 `capykyo:dev`
+- GitHub 提示：`This branch cannot be rebased due to conflicts`
+- 需要：在主仓库的 `dev` 分支上解决冲突，以远程（fork 仓库）的版本为准
+
+**解决步骤：**
+
+```bash
+# 1. 检查当前分支状态
+git branch -a
+git status
+
+# 2. 切换到目标分支（通常是 dev）
+git checkout dev
+
+# 3. 获取远程仓库最新代码
+git fetch origin
+
+# 4. 添加 fork 仓库作为远程仓库（如果还没有）
+git remote add fork-user https://github.com/ubdmf/novel.git
+# 或者使用 SSH：
+# git remote add fork-user git@github.com:ubdmf/novel.git
+
+# 5. 获取 fork 仓库的分支
+git fetch fork-user dev
+
+# 6. 合并 fork 仓库的分支，使用 -X theirs 参数以远程（fork）版本为准
+git merge fork-user/dev -X theirs --no-edit
+
+# 7. 检查合并结果
+git status
+git log --oneline -5
+
+# 8. 推送到远程仓库
+git push origin dev
+```
+
+**关键参数说明：**
+
+- `-X theirs`：在冲突时优先使用被合并分支（fork-user/dev）的版本
+- `--no-edit`：使用默认的合并提交信息，不打开编辑器
+
+**完整示例：解决 PR #32 冲突**
+
+```bash
+# === 初始状态检查 ===
+git branch -a
+# * master
+#   remotes/origin/HEAD -> origin/master
+#   remotes/origin/dev
+#   remotes/origin/master
+
+git status
+# On branch master
+# Your branch is up to date with 'origin/master'.
+
+# === 切换到 dev 分支 ===
+git checkout dev
+# branch 'dev' set up to track 'origin/dev'.
+# Switched to a new branch 'dev'
+
+# === 获取远程更新 ===
+git fetch origin dev
+
+# === 添加 fork 仓库 ===
+git remote add ubdmf https://github.com/ubdmf/novel.git
+# 如果已存在，会提示错误，可以忽略
+
+# === 获取 fork 仓库的 dev 分支 ===
+git fetch ubdmf dev
+# From https://github.com/ubdmf/novel
+#  * branch            dev        -> FETCH_HEAD
+#  * [new branch]      dev        -> ubdmf/dev
+
+# === 合并并解决冲突（以 fork 版本为准） ===
+git merge ubdmf/dev -X theirs --no-edit
+# Merge made by the 'ort' strategy.
+#  package.json                     |  2 ++
+#  pnpm-lock.yaml                   | 71 ++++++++++++++++++++++++++++++++++++++++
+#  src/components/ui/slider.tsx     | 26 +++++++++++++++
+#  src/components/ui/switch.tsx     | 29 ++++++++++++++++
+#  src/contexts/SettingsContext.tsx | 16 +++++++--
+#  5 files changed, 141 insertions(+), 3 deletions(-)
+
+# === 验证合并结果 ===
+git status
+# On branch dev
+# Your branch is ahead of 'origin/dev' by 33 commits.
+
+git log --oneline -5
+# e0975a4 Merge remote-tracking branch 'ubdmf/dev' into dev
+# ebc6859 feat: add Slider and Switch components using Radix UI
+# f03ade3 feat: enhance SwipeContainer with improved swipe functionality
+# ...
+
+# === 推送到远程 ===
+git push origin dev
+# To github.com:capykyo/novel.git
+#    f03ade3..e0975a4  dev -> dev
+```
+
+**合并策略选择：**
+
+| 策略 | 命令 | 适用场景 |
+|------|------|----------|
+| **以 fork 版本为准** | `git merge fork-user/dev -X theirs` | 当 fork 仓库的代码是正确的新版本时（推荐） |
+| **以本地版本为准** | `git merge fork-user/dev -X ours` | 当本地代码是正确版本时 |
+| **手动解决** | `git merge fork-user/dev` | 需要仔细审查每个冲突时 |
+
+**注意事项：**
+
+1. ✅ **使用 HTTPS 而非 SSH**：如果 SSH 连接有问题（如 `Connection closed by 198.18.0.16 port 22`），可以切换到 HTTPS：
+   ```bash
+   git remote set-url origin https://github.com/capykyo/novel.git
+   ```
+
+2. ✅ **验证合并结果**：合并后检查文件变更，确保没有意外丢失代码
+
+3. ✅ **推送后检查 PR**：推送完成后，在 GitHub 上检查 PR 状态，应该可以正常合并了
+
+4. ✅ **清理远程仓库**：如果不再需要 fork 仓库的远程引用，可以删除：
+   ```bash
+   git remote remove fork-user
+   ```
+
+**为什么使用 `-X theirs`？**
+
+- PR 的目的是将 fork 仓库的更改合并到主仓库
+- Fork 仓库通常包含新功能或修复
+- 以 fork 版本为准可以确保新功能完整保留
+- 如果 fork 版本有问题，可以在合并后修复
+
+**与 Rebase 的区别：**
+
+- **Merge + `-X theirs`**：保留完整历史，一次性解决所有冲突，以指定版本为准
+- **Rebase**：重写历史，逐个提交解决冲突，需要手动选择每个冲突的版本
+
+对于 PR 冲突解决，推荐使用 Merge + `-X theirs`，因为：
+- ✅ 操作简单，一次性解决
+- ✅ 保留完整历史
+- ✅ 不需要强制推送
+- ✅ 适合多人协作场景
+
 ### 7.1. 为什么 Rebase 也会产生冲突？
 
 Rebase 冲突与 Merge 冲突的原因类似，但处理方式不同：
