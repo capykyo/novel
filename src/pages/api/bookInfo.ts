@@ -13,6 +13,11 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
+  if (process.env.USE_MOCK_API === "true") {
+    const { default: mock } = await import("@/lib/api/mock/bookInfo");
+    return mock(req, res);
+  }
+
   if (req.method !== "GET") {
     return res.status(405).json({ error: "Method Not Allowed" });
   }

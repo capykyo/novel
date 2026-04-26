@@ -12,6 +12,11 @@ function stripHtmlTags(html: string): string {
 }
 
 export default async function handler(req: NextApiRequest, res: SseResponse) {
+  if (process.env.USE_MOCK_API === "true") {
+    const { default: mock } = await import("@/lib/api/mock/aiReader");
+    return mock(req, res);
+  }
+
   const { number, url: urlParam } = req.query;
   const url =
     typeof urlParam === "string"

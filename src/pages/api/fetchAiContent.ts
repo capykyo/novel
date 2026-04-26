@@ -39,6 +39,11 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
+  if (process.env.USE_MOCK_API === "true") {
+    const { default: mock } = await import("@/lib/api/mock/fetchAiContent");
+    return mock(req, res);
+  }
+
   // 检查请求方法
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method Not Allowed" });
