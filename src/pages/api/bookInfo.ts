@@ -1,8 +1,9 @@
 // pages/api/bookInfo.ts
 import type { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
-import { getParser, getSupportedSites, validateBookUrl } from "@/configs";
+import { getParser, validateBookUrl } from "@/configs";
 import { BookProps } from "@/types/book";
+import { unsupportedSite } from "@/lib/api/errors";
 
 type Data = BookProps & {
   error?: string;
@@ -12,6 +13,10 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
+  if (req.method !== "GET") {
+    return res.status(405).json({ error: "Method Not Allowed" });
+  }
+
   const { url } = req.query;
 
   if (!url || typeof url !== "string") {
@@ -27,12 +32,7 @@ export default async function handler(
     // 获取对应的解析器
     const parser = getParser(url);
     if (!parser) {
-      const supportedSites = getSupportedSites()
-        .map((site) => site.domain)
-        .join(", ");
-      return res.status(400).json({
-        error: `Unsupported website. Supported sites: ${supportedSites}`,
-      });
+      return unsupportedSite(res);
     }
 
     // 构建请求URL

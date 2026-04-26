@@ -1,7 +1,8 @@
 // pages/api/fetchArticle.ts
 import type { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
-import { getParser, getSupportedSites, validateBookUrl } from "@/configs";
+import { getParser, validateBookUrl } from "@/configs";
+import { unsupportedSite } from "@/lib/api/errors";
 
 type Data = {
   content?: string;
@@ -12,6 +13,10 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
+  if (req.method !== "GET") {
+    return res.status(405).json({ error: "Method Not Allowed" });
+  }
+
   const { url, number } = req.query;
 
   if (!number || typeof number !== "string" || !url || typeof url !== "string") {
@@ -27,12 +32,7 @@ export default async function handler(
     // 获取对应的解析器
     const parser = getParser(url);
     if (!parser) {
-      const supportedSites = getSupportedSites()
-        .map((site) => site.domain)
-        .join(", ");
-      return res.status(400).json({
-        error: `Unsupported website. Supported sites: ${supportedSites}`,
-      });
+      return unsupportedSite(res);
     }
 
     const chapterNumber = parseInt(number, 10);
