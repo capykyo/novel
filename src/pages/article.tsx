@@ -118,6 +118,7 @@ function ArticlePage({ number, url }: ServerSideProps) {
   }, [currentPage]); // 依赖于 currentPage
   return (
     <MainLayout>
+      <ScrollProgress />
       <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2 mb-2">
         <EstimatedReadingTime wordCount={content.length} />
         <ReadingTime />
@@ -155,7 +156,6 @@ function ArticlePage({ number, url }: ServerSideProps) {
         className="content dark:text-stone-300 min-h-[calc(100vh-100px)] flex flex-col"
         style={{ touchAction: "pan-y" }}
       >
-        <ScrollProgress />
         {isLoading ? (
           <Loading />
         ) : (

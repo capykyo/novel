@@ -1,143 +1,74 @@
-// 测试api
-import type { NextApiRequest, NextApiResponse } from "next";
-import OpenAI from "openai";
+import type { NextApiRequest } from "next";
+import Client from "@/lib/modelManager";
 import { formatTime } from "@/utils/dateFormat";
 import { removeWhitespaceAndNewlines } from "@/utils/textFormat";
 import { JSDOM } from "jsdom";
-
-interface CustomResponse extends NextApiResponse {
-  flush?: () => void;
-}
+import { resolveApiKey, getClientApiKey } from "@/lib/api/apiKey";
+import { setSseHeaders, writeSseError, SseResponse } from "@/lib/api/sse";
 
 function stripHtmlTags(html: string): string {
   const dom = new JSDOM(html);
   return dom.window.document.body.textContent || "";
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: CustomResponse
-) {
-  const { number, url: urlParam, apiKey: clientApiKey } = req.query;
-  
-  // 确保 url 是字符串类型
-  const url = typeof urlParam === "string" ? urlParam : Array.isArray(urlParam) ? urlParam[0] : "";
-  
-  // 验证必需参数
-  if (!url || !number) {
-    res.setHeader("Content-Type", "text/event-stream");
-    res.setHeader("Cache-Control", "no-cache");
-    res.setHeader("Connection", "keep-alive");
-    res.write(
-      `event: error\ndata: ${JSON.stringify({
-        error: "缺少必需参数：url 或 number",
-      })}\n\n`
-    );
-    res.end();
-    return;
-  }
-  
-  // 获取 API Key：生产环境必须使用客户端提供的，开发环境优先使用客户端的，否则使用环境变量
-  const isProduction = process.env.NODE_ENV === "production";
-  let apiKey: string | undefined;
+export default async function handler(req: NextApiRequest, res: SseResponse) {
+  const { number, url: urlParam } = req.query;
+  const url =
+    typeof urlParam === "string"
+      ? urlParam
+      : Array.isArray(urlParam)
+      ? urlParam[0]
+      : "";
 
-  if (isProduction) {
-    // 生产环境：必须使用客户端提供的 API Key
-    apiKey = typeof clientApiKey === "string" ? clientApiKey : undefined;
-    if (!apiKey) {
-      res.setHeader("Content-Type", "text/event-stream");
-      res.setHeader("Cache-Control", "no-cache");
-      res.setHeader("Connection", "keep-alive");
-      res.write(
-        `event: error\ndata: ${JSON.stringify({
-          error: "API Key 未配置，请在设置页面配置 API Key",
-        })}\n\n`
-      );
-      res.end();
-      return;
-    }
-  } else {
-    // 开发环境：优先使用客户端提供的，否则使用环境变量
-    apiKey = (typeof clientApiKey === "string" ? clientApiKey : undefined) || process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-      res.setHeader("Content-Type", "text/event-stream");
-      res.setHeader("Cache-Control", "no-cache");
-      res.setHeader("Connection", "keep-alive");
-      res.write(
-        `event: error\ndata: ${JSON.stringify({
-          error: "API Key 未配置，请在设置页面配置 API Key 或在环境变量中设置 OPENAI_API_KEY",
-        })}\n\n`
-      );
-      res.end();
-      return;
-    }
+  if (!url || !number) {
+    setSseHeaders(res);
+    return writeSseError(res, "缺少必需参数：url 或 number");
+  }
+
+  const resolved = resolveApiKey(getClientApiKey(req, "query"));
+  if ("error" in resolved) {
+    setSseHeaders(res);
+    return writeSseError(res, resolved.error);
   }
 
   try {
-    // 在服务端发起请求，因为没有当前页这个概念，所以不能使用相对路径来发起请求
     const host = req.headers.host || "localhost:3000";
     const protocol = req.headers["x-forwarded-proto"] || "http";
-    // url 从查询参数获取，Next.js 会自动解码，所以需要重新编码
     const encodedUrl = encodeURIComponent(url);
-    const chapterNumber = typeof number === "string" ? number : Array.isArray(number) ? number[0] : String(number);
+    const chapterNumber =
+      typeof number === "string"
+        ? number
+        : Array.isArray(number)
+        ? number[0]
+        : String(number);
     const fetchURL = `${protocol}://${host}/api/fetchArticle?number=${chapterNumber}&url=${encodedUrl}`;
 
     const response = await fetch(fetchURL);
 
     if (!response.ok) {
-      console.error("Fetch error:", response.status, response.statusText);
-      // 尝试解析错误信息
       let errorMessage = "获取文章内容失败";
       try {
         const errorData = await response.json();
-        if (errorData.error) {
-          errorMessage = errorData.error;
-        }
+        if (errorData.error) errorMessage = errorData.error;
       } catch {
-        // 如果无法解析错误信息，使用默认消息
+        // 使用默认消息
       }
-      
-      res.setHeader("Content-Type", "text/event-stream");
-      res.setHeader("Cache-Control", "no-cache");
-      res.setHeader("Connection", "keep-alive");
-      res.write(
-        `event: error\ndata: ${JSON.stringify({
-          error: errorMessage,
-        })}\n\n`
-      );
-      res.end();
-      return;
+      setSseHeaders(res);
+      return writeSseError(res, errorMessage);
     }
 
     const article = await response.json();
-    
-    // 检查文章内容是否存在
-    if (!article || !article.content) {
-      res.setHeader("Content-Type", "text/event-stream");
-      res.setHeader("Cache-Control", "no-cache");
-      res.setHeader("Connection", "keep-alive");
-      res.write(
-        `event: error\ndata: ${JSON.stringify({
-          error: article?.error || "文章内容为空",
-        })}\n\n`
-      );
-      res.end();
-      return;
+
+    if (!article?.content) {
+      setSseHeaders(res);
+      return writeSseError(res, article?.error || "文章内容为空");
     }
 
     const processedArticle = stripHtmlTags(
       removeWhitespaceAndNewlines(article.content)
     );
 
-    // GET 请求用于建立 EventSource 连接
-    const openai = new OpenAI({
-      apiKey: apiKey,
-    });
-    // 设置 SSE 头部
-    res.setHeader("Content-Type", "text/event-stream");
-    res.setHeader("Cache-Control", "no-cache");
-    res.setHeader("Connection", "keep-alive");
-    res.setHeader("X-Accel-Buffering", "no");
+    setSseHeaders(res);
 
     const startTime = Date.now();
     if (process.env.NODE_ENV !== "production") {
@@ -148,7 +79,9 @@ export default async function handler(
       if (process.env.NODE_ENV !== "production") {
         console.log("开始调用 OpenAI API:", formatTime(Date.now()));
       }
-      const stream = await openai.beta.chat.completions.stream({
+
+      const client = new Client(resolved.apiKey);
+      const stream = await client.streamChatCompletion()({
         model: "internlm/internlm2_5-7b-chat",
         temperature: 0.5,
         messages: [
@@ -179,24 +112,22 @@ export default async function handler(
 请直接输出精简内容，无需解释你的处理过程。
             `,
           },
-          { role: "user", content: processedArticle || "请提供文章内容" }, // 使用存储的文章内容
+          { role: "user", content: processedArticle || "请提供文章内容" },
         ],
       });
+
       if (process.env.NODE_ENV !== "production") {
         console.log("OpenAI API 返回stream时间:", formatTime(Date.now()));
       }
 
       res.write(`event: start\ndata: ${processedArticle.length}\n\n`);
-      // 发送数据流
+
       for await (const chunk of stream) {
         const content = chunk.choices[0]?.delta?.content || "";
         res.write(`data: ${content}\n\n`);
-        if (res.flush) {
-          res.flush();
-        }
+        if (res.flush) res.flush();
       }
 
-      // 发送完成事件
       res.write(`event: done\ndata: completed\n\n`);
       res.end();
 
@@ -214,15 +145,10 @@ export default async function handler(
           : err?.message?.includes("rate limit")
           ? "API 调用频率过高，请稍后重试"
           : "AI 处理失败，请稍后重试";
-      res.write(
-        `event: error\ndata: ${JSON.stringify({
-          error: errorMessage,
-        })}\n\n`
-      );
-      res.end();
+      writeSseError(res, errorMessage);
     }
   } catch (error) {
     console.error("Error during fetch:", error);
-    return res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 }
