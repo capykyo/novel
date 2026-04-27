@@ -15,7 +15,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   useEffect(() => {
     const { pathname } = router;
-    setIsSettingButtonShown(pathname === "/article" || pathname === "/aireading");
+    setIsSettingButtonShown(pathname === "/article" || pathname === "/ai-reading");
   }, [router]);
   return (
     <div

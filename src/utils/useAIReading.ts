@@ -11,8 +11,8 @@ const prefetchAIContent = (content: string, apiKey?: string) => {
   const processedContent = stripHtmlTags(removeWhitespaceAndNewlines(content));
   const body = { prompt: processedContent, apiKey };
 
-  preload(`/api/fetchAiContent`, async () => {
-    const result = (await apiClient.post(`/fetchAiContent`, body)) as {
+  preload(`/api/ai-summary`, async () => {
+    const result = (await apiClient.post(`/ai-summary`, body)) as {
       content: string;
     };
     return result.content;
@@ -35,7 +35,7 @@ export function useAIReading(
     // 从 localStorage 获取 API Key
     const apiKey = storage.get<string>("apiKey", "");
 
-    const result = (await apiClient.post(`/fetchAiContent`, {
+    const result = (await apiClient.post(`/ai-summary`, {
       prompt: processedContent,
       apiKey,
     })) as { content: string };

@@ -43,7 +43,7 @@ function HomePage() {
           </p>
         </div>
         <div className="">
-          <Link href="/controlpanel">
+          <Link href="/dashboard">
             <ShinyButton>Try it now</ShinyButton>
           </Link>
         </div>

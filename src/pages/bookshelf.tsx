@@ -99,7 +99,7 @@ function BookshelfPage() {
       }
       const fetchBookInfo = async () => {
         try {
-          const res = await fetch(`/api/bookInfo?url=${bookUrl}`);
+          const res = await fetch(`/api/book-info?url=${bookUrl}`);
           if (!res.ok) {
             throw new Error("Failed to fetch book info");
           }
@@ -187,7 +187,7 @@ function BookshelfPage() {
         <BreadcrumbNav
           items={[
             { label: "Home", href: "/" },
-            { label: "控制台", href: "/controlpanel" },
+            { label: "控制台", href: "/dashboard" },
             { label: "书柜管理", isPage: true },
           ]}
         />

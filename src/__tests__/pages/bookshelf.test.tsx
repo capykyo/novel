@@ -136,7 +136,7 @@ describe("BookshelfPage", () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith(`/api/bookInfo?url=${testUrl}`);
+      expect(global.fetch).toHaveBeenCalledWith(`/api/book-info?url=${testUrl}`);
     });
 
     await waitFor(() => {

@@ -46,7 +46,7 @@ export default async function handler(req: NextApiRequest, res: SseResponse) {
         : Array.isArray(number)
         ? number[0]
         : String(number);
-    const fetchURL = `${protocol}://${host}/api/fetchArticle?number=${chapterNumber}&url=${encodedUrl}`;
+    const fetchURL = `${protocol}://${host}/api/article-content?number=${chapterNumber}&url=${encodedUrl}`;
 
     const response = await fetch(fetchURL);
 

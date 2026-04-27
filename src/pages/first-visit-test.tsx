@@ -44,11 +44,11 @@ export default function FirstVisitTestPage() {
 
   const testPages = [
     { name: "首页", path: "/" },
-    { name: "控制台", path: "/controlpanel" },
+    { name: "控制台", path: "/dashboard" },
     { name: "书柜管理", path: "/bookshelf" },
     { name: "设置", path: "/settings" },
     { name: "文章（无参数 - 应重定向）", path: "/article" },
-    { name: "AI 阅读（无参数 - 应重定向）", path: "/aireading" },
+    { name: "AI 阅读（无参数 - 应重定向）", path: "/ai-reading" },
   ];
 
   const clearStorage = () => {
