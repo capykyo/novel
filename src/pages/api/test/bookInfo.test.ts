@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { NextApiRequest, NextApiResponse } from "next"; // Import types
-import handler from "../bookInfo"; // Import your API handler
+import handler from "../book-info"; // Import your API handler
 import axios from "axios"; // Import axiosq
 import { bookInfo } from "./res";
 

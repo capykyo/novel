@@ -28,7 +28,7 @@ export async function getServerSideProps(context: { query: ServerSideProps }) {
   if (!number || !url) {
     return {
       redirect: {
-        destination: "/controlpanel",
+        destination: "/dashboard",
         permanent: false,
       },
     };
@@ -75,7 +75,7 @@ export default function AiReadingPage({
 
     // 创建 EventSource 实例，传递 API Key
     const eventSource = new EventSource(
-      `/api/aiReader?number=${number}&url=${encodeURIComponent(url)}${
+      `/api/ai-summary-stream?number=${number}&url=${encodeURIComponent(url)}${
         apiKey ? `&apiKey=${encodeURIComponent(apiKey)}` : ""
       }`
     );
@@ -146,7 +146,7 @@ export default function AiReadingPage({
     updateBookCurrentChapter(newPage);
     router.push(
       {
-        pathname: "/aireading",
+        pathname: "/ai-reading",
         query: {
           number: newPage,
           url: url,
@@ -165,7 +165,7 @@ export default function AiReadingPage({
     updateBookCurrentChapter(newPage);
     router.push(
       {
-        pathname: "/aireading",
+        pathname: "/ai-reading",
         query: {
           number: newPage,
           url: url,
@@ -216,7 +216,7 @@ export default function AiReadingPage({
       <BreadcrumbNav
         items={[
           { label: "Home", href: "/" },
-          { label: "控制台", href: "/controlpanel" },
+          { label: "控制台", href: "/dashboard" },
           { label: book?.title || "AI 阅读", isPage: true },
         ]}
       />
