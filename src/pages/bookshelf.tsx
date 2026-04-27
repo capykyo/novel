@@ -99,7 +99,7 @@ function BookshelfPage() {
       }
       const fetchBookInfo = async () => {
         try {
-          const res = await fetch(`/api/book-info?url=${bookUrl}`);
+          const res = await fetch(`/api/book-info?url=${encodeURIComponent(bookUrl)}`);
           if (!res.ok) {
             throw new Error("Failed to fetch book info");
           }

@@ -6,7 +6,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 // 预加载函数
 const prefetchPage = (pageNumber: number, url: string) => {
-  const prefetchUrl = `/api/article-content?number=${pageNumber}&url=${url}`;
+  const prefetchUrl = `/api/article-content?number=${pageNumber}&url=${encodeURIComponent(url)}`;
   preload(prefetchUrl, fetcher);
 };
 
@@ -23,7 +23,7 @@ export function usePagination(initialPage: number, url: string) {
 
   // 使用SWR来获取文章数据
   const { data, error } = useSWR(
-    `/api/article-content?number=${currentPage}&url=${url}`,
+    `/api/article-content?number=${currentPage}&url=${encodeURIComponent(url)}`,
     fetcher
   );
 
