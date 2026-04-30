@@ -1,4 +1,4 @@
-// pages/api/fetchAiContent.ts
+// pages/api/ai-summary.ts
 import type { NextApiRequest, NextApiResponse } from "next";
 import Client from "@/lib/modelManager";
 import { ChatCompletionMessageParam } from "openai/resources/chat/completions";

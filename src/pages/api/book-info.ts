@@ -1,4 +1,4 @@
-// pages/api/bookInfo.ts
+// pages/api/book-info.ts
 import type { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
 import { getParser, validateBookUrl } from "@/configs";
