@@ -1,3 +1,9 @@
+---
+title: src/pages 文件名 kebab-case 重构
+date: 2026-04-30
+status: done
+---
+
 # Refactor Plan: src/pages 文件名重构
 
 ## 当前状态
