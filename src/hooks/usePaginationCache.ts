@@ -1,4 +1,4 @@
-// utils/paginationCache.ts
+// hooks/usePaginationCache.ts
 import useSWR, { preload } from "swr";
 import { useState, useEffect } from "react";
 
