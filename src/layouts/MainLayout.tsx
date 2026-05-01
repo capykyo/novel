@@ -1,5 +1,5 @@
 import { Header, Footer } from "@/components/layout";
-import GlobalSettingsButton from "@/components/GlobalSettingsButton";
+import GlobalSettingsButton from "@/components/layout/GlobalSettingsButton";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 
