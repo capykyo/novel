@@ -1,3 +1,4 @@
+import { GetServerSideProps } from "next";
 import MainLayout from "@/layouts/MainLayout";
 import { usePagination } from "@/utils/paginationCache";
 import { useState, useEffect } from "react";
@@ -5,6 +6,13 @@ import MarkdownRenderer from "@/components/MarkdownRenderer";
 import EstimatedReadingTime from "@/components/EstimatedReadingTime";
 import { removeWhitespaceAndNewlines, stripHtmlTags } from "@/utils/textFormat";
 import apiClient from "@/lib/apiClient";
+export const getServerSideProps: GetServerSideProps = async () => {
+  if (process.env.NODE_ENV !== "development") {
+    return { notFound: true };
+  }
+  return { props: {} };
+};
+
 export default function ModelPage() {
   const [response, setResponse] = useState<string>("");
   const { content, handleNextPage, handlePrevPage } = usePagination(

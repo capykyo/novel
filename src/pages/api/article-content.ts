@@ -14,7 +14,7 @@ export default async function handler(
   res: NextApiResponse<Data>
 ) {
   if (process.env.USE_MOCK_API === "true") {
-    const { default: mock } = await import("@/lib/api/mock/fetchArticle");
+    const { default: mock } = await import("@/lib/api/mock/article-content");
     return mock(req, res);
   }
 

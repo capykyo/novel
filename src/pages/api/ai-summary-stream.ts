@@ -13,7 +13,7 @@ function stripHtmlTags(html: string): string {
 
 export default async function handler(req: NextApiRequest, res: SseResponse) {
   if (process.env.USE_MOCK_API === "true") {
-    const { default: mock } = await import("@/lib/api/mock/aiReader");
+    const { default: mock } = await import("@/lib/api/mock/ai-reader");
     return mock(req, res);
   }
 
