@@ -2,8 +2,8 @@ import { GetServerSideProps } from "next";
 import MainLayout from "@/layouts/MainLayout";
 import { usePagination } from "@/hooks/usePaginationCache";
 import { useState, useEffect } from "react";
-import MarkdownRenderer from "@/components/MarkdownRenderer";
-import EstimatedReadingTime from "@/components/EstimatedReadingTime";
+import MarkdownRenderer from "@/components/reading/MarkdownRenderer";
+import EstimatedReadingTime from "@/components/reading/EstimatedReadingTime";
 import { removeWhitespaceAndNewlines, stripHtmlTags } from "@/utils/textFormat";
 import apiClient from "@/lib/apiClient";
 export const getServerSideProps: GetServerSideProps = async () => {

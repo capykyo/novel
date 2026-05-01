@@ -1,6 +1,6 @@
 import MainLayout from "@/layouts/MainLayout";
-import EstimatedReadingTime from "@/components/EstimatedReadingTime";
-import ReadingTime from "@/components/ReadingDuration";
+import EstimatedReadingTime from "@/components/reading/EstimatedReadingTime";
+import ReadingTime from "@/components/reading/ReadingDuration";
 import BreadcrumbNav from "@/components/comm/BreadcrumbNav";
 import { ScrollProgress } from "@/components/magicui/scroll-progress";
 import { BookProps } from "@/types/book";
