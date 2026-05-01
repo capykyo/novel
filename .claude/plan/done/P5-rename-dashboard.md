@@ -1,3 +1,9 @@
+---
+title: P5：dashboard 页面重命名
+date: 2026-05-01
+status: done
+---
+
 # P5：dashboard 页面重命名
 
 ## 问题

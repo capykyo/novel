@@ -1,3 +1,9 @@
+---
+title: P3：修正 index.tsx 职责
+date: 2026-05-01
+status: done
+---
+
 # P3：修正 index.tsx 职责
 
 ## 问题

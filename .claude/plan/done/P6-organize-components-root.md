@@ -1,3 +1,9 @@
+---
+title: P6：整理 components/ 根目录散落文件
+date: 2026-05-01
+status: done
+---
+
 # P6：整理 components/ 根目录散落文件
 
 ## 问题
