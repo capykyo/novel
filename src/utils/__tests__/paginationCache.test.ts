@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, vi } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import { usePagination } from "@/utils/paginationCache";
+import { usePagination } from "@/hooks/usePaginationCache";
 
 describe("usePagination", () => {
   beforeAll(() => {

@@ -1,6 +1,6 @@
 import { GetServerSideProps } from "next";
 import MainLayout from "@/layouts/MainLayout";
-import { usePagination } from "@/utils/paginationCache";
+import { usePagination } from "@/hooks/usePaginationCache";
 import { useState, useEffect } from "react";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
 import EstimatedReadingTime from "@/components/EstimatedReadingTime";

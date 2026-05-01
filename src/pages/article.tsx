@@ -5,7 +5,7 @@ import BreadcrumbNav from "@/components/comm/BreadcrumbNav";
 import { ScrollProgress } from "@/components/magicui/scroll-progress";
 import { BookProps } from "@/types/book";
 import { useState, useEffect } from "react";
-import { usePagination } from "@/utils/paginationCache";
+import { usePagination } from "@/hooks/usePaginationCache";
 import { cleanHtmlContent } from "@/utils/helper";
 import { useSettings } from "@/contexts/SettingsContext";
 import { useRouter } from "next/router";
