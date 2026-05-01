@@ -1,3 +1,9 @@
+---
+title: P4：整理 utils/ 与 lib/ 目录边界
+date: 2026-05-01
+status: done
+---
+
 # P4：整理 utils/ 与 lib/ 目录边界
 
 ## 问题

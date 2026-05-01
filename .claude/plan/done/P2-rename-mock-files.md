@@ -1,3 +1,9 @@
+---
+title: P2：mock 文件命名统一为 kebab-case
+date: 2026-05-01
+status: done
+---
+
 # P2：mock 文件命名统一为 kebab-case
 
 ## 问题
