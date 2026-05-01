@@ -44,7 +44,7 @@ export default function FirstVisitTestPage() {
 
   const testPages = [
     { name: "首页", path: "/" },
-    { name: "控制台", path: "/dashboard" },
+    { name: "控制台", path: "/stats" },
     { name: "书柜管理", path: "/bookshelf" },
     { name: "设置", path: "/settings" },
     { name: "文章（无参数 - 应重定向）", path: "/article" },

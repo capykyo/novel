@@ -25,7 +25,7 @@ export async function getServerSideProps(context: { query: ServerSideProps }) {
   if (!number || !url) {
     return {
       redirect: {
-        destination: "/dashboard",
+        destination: "/stats",
         permanent: false,
       },
     };
@@ -126,7 +126,7 @@ function ArticlePage({ number, url }: ServerSideProps) {
       <BreadcrumbNav
         items={[
           { label: "Home", href: "/" },
-          { label: "控制台", href: "/dashboard" },
+          { label: "控制台", href: "/stats" },
           { label: book?.title || "文章", isPage: true },
         ]}
       />

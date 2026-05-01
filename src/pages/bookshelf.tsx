@@ -187,7 +187,7 @@ function BookshelfPage() {
         <BreadcrumbNav
           items={[
             { label: "Home", href: "/" },
-            { label: "控制台", href: "/dashboard" },
+            { label: "控制台", href: "/stats" },
             { label: "书柜管理", isPage: true },
           ]}
         />
