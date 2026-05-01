@@ -83,7 +83,7 @@ export default function SettingsPage() {
       <BreadcrumbNav
         items={[
           { label: "Home", href: "/" },
-          { label: "控制台", href: "/dashboard" },
+          { label: "控制台", href: "/stats" },
           { label: "设置", isPage: true },
         ]}
       />

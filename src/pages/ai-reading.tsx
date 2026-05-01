@@ -28,7 +28,7 @@ export async function getServerSideProps(context: { query: ServerSideProps }) {
   if (!number || !url) {
     return {
       redirect: {
-        destination: "/dashboard",
+        destination: "/stats",
         permanent: false,
       },
     };
@@ -216,7 +216,7 @@ export default function AiReadingPage({
       <BreadcrumbNav
         items={[
           { label: "Home", href: "/" },
-          { label: "控制台", href: "/dashboard" },
+          { label: "控制台", href: "/stats" },
           { label: book?.title || "AI 阅读", isPage: true },
         ]}
       />
