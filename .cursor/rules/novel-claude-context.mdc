@@ -1,0 +1,13 @@
+---
+description: Novel — planning/docs under .claude/ (read dev-process when editing)
+globs: .claude/**/*
+alwaysApply: false
+---
+
+# Novel — `.claude/` workspace
+
+**Authoritative workflow:** `.claude/docs/dev-process.md` (plan contents, verify branch, archive front matter, `issues/` rules).
+
+**Pointers:** Long-form references live in `.claude/docs/` (`stack.md`, `coding-guidelines.md`). Feature overview: `.claude/plan/notes/features.md`.
+
+**Dirs:** `plan/` active work · `plan/done/` archived · `plan/issues/` verification failures · `plan/notes/` ongoing notes — structure detail in `.claude/docs/stack.md`.

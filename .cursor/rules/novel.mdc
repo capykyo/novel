@@ -1,0 +1,31 @@
+---
+description: Novel — always-on triggers & where to read full docs (token-light)
+alwaysApply: true
+---
+
+# Novel — outline only
+
+**Stack:** Next.js 15 · React 19 · TS · Tailwind · Radix · Motion · LangChain/LangGraph · Vitest · pnpm · Vercel (App + Pages Router mix).
+
+**Commands:** `pnpm dev` · `pnpm build` (**required** before claiming done) · `pnpm lint` · `pnpm test:ci`
+
+## When to open which doc (do not invent process)
+
+| Trigger | Read |
+|--------|------|
+| Multi-file / non-trivial change, feature, refactor | `.claude/docs/dev-process.md` — then create or update material under `.claude/plan/` as that file specifies |
+| `pnpm build` or UI verification unclear | `.claude/docs/dev-process.md` (verify + issues branch) |
+| Stack, `src/` layout, `.claude/` tree | `.claude/docs/stack.md` |
+| Code style / abstraction / comments / security baseline | `.claude/docs/coding-guidelines.md` |
+| Product / feature notes | `.claude/plan/notes/features.md` |
+
+## Always-on gates
+
+- **Done:** `pnpm build` passes; if UI or routes changed, browser spot-check core paths (details in dev-process).
+- **Failed verify:** add `.claude/plan/issues/<domain>-<short-title>.md`; **do not** move plans to `done/` until resolved (see dev-process).
+
+## `.claude/plan/` (names only)
+
+Active plans and notes live under `.claude/plan/`; archive → `.claude/plan/done/`; issues → `.claude/plan/issues/`. Exact steps and YAML are **only** in `.claude/docs/dev-process.md`.
+
+Entry mirror: `CLAUDE.md`.

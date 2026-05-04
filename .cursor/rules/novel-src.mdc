@@ -1,0 +1,13 @@
+---
+description: Novel — coding standards while editing src/
+globs: src/**/*
+alwaysApply: false
+---
+
+# Novel — application code
+
+Prefer the canonical list in `.claude/docs/coding-guidelines.md` when unsure.
+
+**Defaults:** No comments unless **why** is non-obvious. No premature abstraction (reuse after **three** similar spots). Extra validation/errors only at boundaries (user input, external APIs). UI changes → exercise core flows in browser. Avoid OWASP Top 10 (XSS, injection, etc.).
+
+**Layout:** Folder roles under `src/` → `.claude/docs/stack.md`.
